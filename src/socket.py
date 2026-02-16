@@ -1,6 +1,6 @@
 import socket
 
-def creer_et_attendre_connexion(port=65432):
+def creer_et_attendre_connexion(port=5555):
    
     HOST = '0.0.0.0'  
     
