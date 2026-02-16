@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import time
+from time import sleep
+from ev3dev2.motor import MediumMotor, LargeMotor, OUTPUT_A,OUTPUT_B, OUTPUT_C, OUTPUT_D, SpeedPercent
 from ev3dev2.sensor.lego import UltrasonicSensor
 from ev3dev2.sensor import INPUT_4 
 
-import src.moteur
+from src.moteur import avanceMotor, stopMotor
 from src.socket import creer_et_attendre_connexion, envoyer_message, fermer_reseau
 
 
