@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from time import sleep
-from ev3dev2.motor import MediumMotor, LargeMotor, OUTPUT_A,OUTPUT_B, OUTPUT_C, OUTPUT_D, SpeedPercent
+from ev3dev2.motor import LargeMotor, OUTPUT_A,OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 from src.moteur import *
 from src.socket import creer_et_attendre_connexion, envoyer_message, fermer_reseau
@@ -18,5 +18,18 @@ avanceVehicule_Uniform(m1,m2,m3,m4,100)
 sleep(20)
 stopVehicule(m1,m2,m3,m4)
 rotation_180(m1,m2,m3,m4)
+
+#test socket 
+client,connexion = creer_et_attendre_connexion()
+message= "la connexion est OK"
+envoyer_message=(connexion,message)
+
+print("fermeture socket dans...")
+for i in range(10):
+    envoyer_message(connexion,i)
+    sleep(1)
+
+fermer_reseau()
+
 
 
