@@ -17,5 +17,6 @@ print("Initialisation du robot...")
 avanceVehicule_Uniform(m1,m2,m3,m4,100)
 sleep(20)
 stopVehicule(m1,m2,m3,m4)
+rotation_180(m1,m2,m3,m4)
 
 
