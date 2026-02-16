@@ -37,3 +37,13 @@ def reculeVehicule_Uniform(motor_avantD, motor_avantG, motor_arriereD, motor_arr
     avanceMotor(motor_arriereD,pourcent)
     avanceMotor(motor_arriereG,pourcent)
 
+
+def stopVehicule(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
+    print("Vehicule off")
+
+    stopMotor(motor_avantD)
+    stopMotor(motor_avantG)
+    stopMotor(motor_arriereD)
+    stopMotor(motor_arriereG)
+
+
