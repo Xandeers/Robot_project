@@ -18,6 +18,8 @@ def stopMotor(motor):
     motor.stop()
 
 
+##### Trajectoir uniforme
+
 def avanceVehicule_Uniform(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG, pourcent):
     print("Vehicule on {} \%".format(pourcent))
 
@@ -46,4 +48,14 @@ def stopVehicule(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
     stopMotor(motor_arriereD)
     stopMotor(motor_arriereG)
 
+def rotation_180(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
 
+    #coté droit avance 
+    avanceMotor(motor_avantD,100)
+    returnMotor(motor_arriereD,100)
+
+    #cote gauche recule
+    returnMotor(motor_avantG,100)
+    avanceMotor(motor_arriereG,100)
+
+# ajouter le stop motor 2 methedo soir avec un sleep mais pas précis ou avec calcule via les roue 
