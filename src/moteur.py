@@ -13,3 +13,15 @@ def stopMotor(motor):
     motor.stop()
 
 
+def avanceVehicule_Uniform(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG, pourcent):
+    print("Vehicule on {} \%".format(pourcent))
+    
+    avanceMotor(motor_avantD,pourcent)
+    avanceMotor(motor_avantG,pourcent)
+
+    avanceMotor(motor_arriereD,-pourcent)
+    avanceMotor(motor_arriereG,-pourcent)
+
+
+
+
