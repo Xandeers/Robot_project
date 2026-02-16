@@ -1,9 +1,10 @@
 import socket
 
-def creer_et_attendre_connexion(port=5555):
+def creer_et_attendre_connexion():
    
     HOST = '0.0.0.0'  
-    
+    port=5555
+
     # Création du socket
     serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serveur.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -41,7 +42,7 @@ def fermer_reseau(serveur, connexion):
     """
     Ferme proprement les connexions réseau pour éviter les bugs au prochain lancement.
     """
-    print("Fermeture des connexions réseau...")
+    print("Fermeture des connexions réseau effectué")
     if connexion:
         connexion.close()
     if serveur:
