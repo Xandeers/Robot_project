@@ -8,6 +8,11 @@ def avanceMotor(motor, pourcent):
     print("Moteur {} on {}".format(motor, pourcent))
     motor.on(SpeedPercent(pourcent))
 
+
+def returnMotor(motor, pourcent):
+    avanceMotor(motor,-pourcent)
+    
+
 def stopMotor(motor):
     print("Moteur {} off".format(motor))
     motor.stop()
@@ -15,13 +20,20 @@ def stopMotor(motor):
 
 def avanceVehicule_Uniform(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG, pourcent):
     print("Vehicule on {} \%".format(pourcent))
-    
+
     avanceMotor(motor_avantD,pourcent)
     avanceMotor(motor_avantG,pourcent)
 
-    avanceMotor(motor_arriereD,-pourcent)
-    avanceMotor(motor_arriereG,-pourcent)
+    returnMotor(motor_arriereD,pourcent)
+    returnMotor(motor_arriereG,pourcent)
 
 
+def reculeVehicule_Uniform(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG, pourcent):
+    print("Vehicule on return {} \%".format(pourcent))
 
+    returnMotor(motor_avantD,pourcent)
+    returnMotor(motor_avantG,pourcent)
+
+    avanceMotor(motor_arriereD,pourcent)
+    avanceMotor(motor_arriereG,pourcent)
 
