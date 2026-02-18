@@ -1,0 +1,16 @@
+# Environnements virtuels (Le plus important !)
+venv/
+env/
+
+# Fichiers compilés Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Fichiers de configuration des éditeurs de code (IDE)
+.vscode/
+.idea/
+
+# Fichiers système de l'ordinateur
+.DS_Store
+Thumbs.db

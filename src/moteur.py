@@ -17,7 +17,19 @@ def stopMotor(motor):
     print("Moteur {} off".format(motor))
     motor.stop()
 
+def getVitesse(motor):
+    return motor.speed()
 
+def getPosition(motor):
+    return motor.position()
+
+#return une liste de l'etat actuelle du motor ['running'], ['holding'], ['stalled']
+def getEtat(motor):
+    return motor.state()
+
+def boolMotorRuning(motor):
+    return motor.is_running()
+    
 ##### Trajectoir uniforme
 
 def avanceVehicule_Uniform(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG, pourcent):
@@ -58,4 +70,4 @@ def rotation_180(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
     returnMotor(motor_avantG,100)
     avanceMotor(motor_arriereG,100)
 
-# ajouter le stop motor 2 methedo soir avec un sleep mais pas précis ou avec calcule via les roue 
+
