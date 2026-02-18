@@ -15,9 +15,14 @@ m4= LargeMotor(OUTPUT_D)
 print("Initialisation du robot...")
 
 avanceVehicule_Uniform(m1,m2,m3,m4,100)
-sleep(20)
+sleep(10)
 stopVehicule(m1,m2,m3,m4)
-rotation_180(m1,m2,m3,m4)
+rotation_Droite(m1,m2,m3,m4)
+sleep(5)
+avanceVehicule_Uniform(m1,m2,m3,m4,100)
+sleep(5)
+glissement_Avant_droit(m1,m2,m3,m4)
+
 
 #test socket 
 client,connexion = creer_et_attendre_connexion()
@@ -29,7 +34,7 @@ envoyer_message(connexion,message2)
 for i in range(10):
     envoyer_message(connexion,i)
     sleep(1)
-
+    
 fermer_reseau()
 
 
