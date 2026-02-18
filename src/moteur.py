@@ -60,7 +60,7 @@ def stopVehicule(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
     stopMotor(motor_arriereD)
     stopMotor(motor_arriereG)
 
-def rotation_180(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
+def rotation_Droite(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
 
     #coté droit avance 
     avanceMotor(motor_avantD,100)
@@ -69,5 +69,28 @@ def rotation_180(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
     #cote gauche recule
     returnMotor(motor_avantG,100)
     avanceMotor(motor_arriereG,100)
+
+def glissement_Droit(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
+    
+    #mode diagonale
+    avanceMotor(motor_avantD,100)
+    returnMotor(motor_arriereG,100)
+
+
+    returnMotor(motor_avantG,100)
+    avanceMotor(motor_arriereD,100)
+
+def glissement_Avant_droit(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
+
+    #frein a main 
+    motor_avantG.stop_action = 'hold'
+    motor_arriereD.stop_action ='hold'
+    motor_avantG.stop()
+    motor_arriereD.stop()
+
+    #mode diagonale
+    avanceMotor(motor_avantD,100)
+    returnMotor(motor_arriereG,100)
+
 
 
