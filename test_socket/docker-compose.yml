@@ -1,0 +1,25 @@
+services:
+  # robot
+  client-robot:
+    build: .
+    container_name: client-robot
+    networks:
+      mon-reseau-robot:
+        ipv4_address: 172.20.0.10 
+    tty: true
+    stdin_open: true
+
+  # ordi
+  autre-service:
+    build: ./ordi
+    container_name: autre-service
+    networks:
+      mon-reseau-robot:
+        ipv4_address: 172.20.0.20  
+
+networks:
+  mon-reseau-robot:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16  
