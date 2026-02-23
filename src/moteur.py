@@ -29,6 +29,7 @@ def getEtat(motor):
 
 def boolMotorRuning(motor):
     return motor.is_running()
+
     
 ##### Trajectoir uniforme
 
@@ -82,12 +83,7 @@ def glissement_Droit(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG)
 
 def glissement_Avant_droit(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
 
-    #frein a main 
-    motor_avantG.stop_action = 'hold'
-    motor_arriereD.stop_action ='hold'
-    motor_avantG.stop()
-    motor_arriereD.stop()
-
+   
     #mode diagonale
     avanceMotor(motor_avantD,100)
     returnMotor(motor_arriereG,100)
