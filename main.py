@@ -42,6 +42,8 @@ avanceVehicule_Uniform(mAVD,mAVG,mARD,mARG,100)
 while True : 
     if (boolColision(sensor)):
         speaker.beep()
+    sleep(10)
+    break
 
 
 
