@@ -8,7 +8,7 @@ def getvalue(sensor) :
     return sensor.distance_centimeters
 
 def boolColision(sensor):
-    if(getvalue(sensor <= DISTMIN)): 
+    if(getvalue(sensor) <= DISTMIN): 
         return True
     else:
         return False
