@@ -14,8 +14,8 @@ from ev3dev2.sound import Sound
 #motor
 mAVD= LargeMotor(OUTPUT_A)
 mAVG= LargeMotor(OUTPUT_B)
-mARG= LargeMotor(OUTPUT_C)
-mARD= LargeMotor(OUTPUT_D)
+mARD= LargeMotor(OUTPUT_C)
+mARG= LargeMotor(OUTPUT_D)
 
 #ultrasonCapteur
 sensor = UltrasonicSensor(INPUT_4)
@@ -26,14 +26,14 @@ speaker= Sound()
 
 print("Initialisation du robot...")
 
-avanceVehicule_Uniform(mAVD,mAVG,mARG,mARD,100)
+avanceVehicule_Uniform(mAVD,mAVG,mARD,mARG,100)
 sleep(10)
-stopVehicule(mAVD,mAVG,mARG,mARD)
-rotation_Droite(mAVD,mAVG,mARG,mARD)
+stopVehicule(mAVD,mAVG,mARD,mARG)
+rotation_Droite(mAVD,mAVG,mARD,mARG)
 sleep(5)
-avanceVehicule_Uniform(mAVD,mAVG,mARG,mARD,100)
+avanceVehicule_Uniform(mAVD,mAVG,mARD,mARG,100)
 sleep(5)
-glissement_Avant_droit(mAVD,mAVG,mARG,mARD)
+glissement_Avant_droit(mAVD,mAVG,mARD,mARG)
 
 
 #test colision 
