@@ -23,17 +23,17 @@ sensor = UltrasonicSensor(INPUT_4)
 #Speaker
 speaker= Sound()
 
+speaker.speak('SPAW SPAW')
 
 print("Initialisation du robot...")
 
 avanceVehicule_Uniform(mAVD,mAVG,mARD,mARG,100)
-sleep(10)
+sleep(2)
 stopVehicule(mAVD,mAVG,mARD,mARG)
 rotation_Droite(mAVD,mAVG,mARD,mARG)
 sleep(5)
 avanceVehicule_Uniform(mAVD,mAVG,mARD,mARG,100)
-sleep(5)
-glissement_Avant_droit(mAVD,mAVG,mARD,mARG)
+
 
 
 #test colision 
