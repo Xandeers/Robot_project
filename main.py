@@ -24,6 +24,7 @@ sensor = UltrasonicSensor(INPUT_4)
 speaker= Sound()
 
 speaker.speak('SPAW SPAW')
+speaker.play_file("audio/New-Recording-4.wav",100,1)
 
 print("Initialisation du robot...")
 
