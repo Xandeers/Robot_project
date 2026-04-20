@@ -23,8 +23,8 @@ sensor = UltrasonicSensor(INPUT_4)
 #Speaker
 speaker= Sound()
 
-speaker.speak('SPAW SPAW')
-speaker.play_file('audio/New-Recording-4.wav',100,1)
+speaker.speak('SPAW SPAW') 
+speaker.play_file('audio/New-Recording-4.wav', volume=100)
 
 print("Initialisation du robot...")
 
