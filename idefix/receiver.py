@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import struct
 from camera.terrain import Terrain
+from camera.Tracker.ball import BallTracker
 
 
 # Configuration
@@ -18,6 +19,7 @@ print("Listening for UDP frames...")
 
 
 terrain_manager = Terrain(num_zones=2, points_per_zone=8)
+ball_tracker = BallTracker()
 window_name = "Received Frame"
 cv2.namedWindow(window_name)
 
@@ -51,6 +53,31 @@ while True:
                     if len(terrain_manager.points) < 16:
                         cv2.putText(frame, f"Calibration: {len(terrain_manager.points)}/16", 
                                     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        
+    # Tracker la balle
+                    ball_info = ball_tracker.get_position(frame)
+    
+    # Dessiner la balle et les zones
+                    frame = ball_tracker.draw_ball(frame, ball_info)
+                    frame = terrain_manager.draw_zones(frame)
+
+    #  La balle est-elle dans une zone ?
+                    if ball_info:
+                        pos = ball_info["center"]
+                        
+                        # Test Zone 1
+                        if terrain_manager.is_in_zone(pos, 0):
+                            cv2.putText(frame, "BALLE ZONE 1", (50, 50), 
+                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                        
+                        # Test Zone 2 
+                        elif terrain_manager.is_in_zone(pos, 1):
+                            cv2.putText(frame, "BALLE ZONE 2", (50, 50), 
+                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+                        
+                        else:
+                            cv2.putText(frame, "BALLE HORS ZONE", (50, 50), 
+                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                         
                     cv2.imshow("Received Frame", frame)
                     ch = chr(cv2.waitKey(int(1)) & 0xFF)
