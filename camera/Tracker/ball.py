@@ -44,3 +44,14 @@ class Ball :
                 }
         
         return ball_data
+    
+
+    def draw_ball(self, frame, ball_data):
+        """Dessine un cercle autour de la balle sur l'image."""
+        if ball_data:
+            center = ball_data["center"]
+            radius = ball_data["radius"]
+            # Dessine le contour (vert) et le centre (rouge)
+            cv2.circle(frame, center, radius, (0, 255, 0), 2)
+            cv2.circle(frame, center, 5, (0, 0, 255), -1)
+        return frame
