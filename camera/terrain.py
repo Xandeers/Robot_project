@@ -1,12 +1,30 @@
 import cv2
 import numpy as np
+import json 
+import os
 
 class Terrain:
 
-    def __init__(self, num_zones=2, points_per_zone=8):
+    def __init__(self, num_zones=2, points_per_zone=8, filename="points_terrain.json"):
         self.points = []
         self.max_points = num_zones * points_per_zone
         self.num_zones = num_zones
+        self.filename = filename
+        self.load_points()
+
+    def load_points(self):
+        """Charge les points depuis le fichier JSON s'il existe."""
+        if os.path.exists(self.filename):
+            with open(self.filename, 'r') as f:
+                self.points = json.load(f)
+            print(f"Points chargés depuis {self.filename} ({len(self.points)} points)")
+
+
+    def save_points(self):
+        """Enregistre la liste de points dans un fichier JSON."""
+        with open(self.filename, 'w') as f:
+            json.dump(self.points, f)
+        print(f"Points sauvegardés dans {self.filename}")
 
 
     def mouse_callback(self, event, x, y, flags, param):
