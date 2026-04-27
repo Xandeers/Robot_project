@@ -22,11 +22,13 @@ class BallTracker :
         mask1 = cv2.inRange(hsv, self.lower_red1, self.upper_red1)
         mask2 = cv2.inRange(hsv, self.lower_red2, self.upper_red2)
         mask = mask1 + mask2
+        
 
         # clean
         kernel = np.ones((5, 5), np.uint8)
-        mask = cv2.erode(mask, kernel, iterations=2)
-        mask = cv2.dilate(mask, kernel, iterations=2)
+        mask = cv2.erode(mask, kernel, iterations=1)
+        mask = cv2.dilate(mask, kernel, iterations=1)
+        cv2.imshow("Debug Masque Balle Clean", mask)
 
         # Détection des contours
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -39,7 +41,7 @@ class BallTracker :
             ((x, y), radius) = cv2.minEnclosingCircle(largest_contour)
 
             # On ne valide que si c'est assez grand pour être une balle
-            if radius > 5:
+            if radius > 1:
                 ball_data = {
                     "center": (int(x), int(y)),
                     "radius": int(radius)
@@ -52,8 +54,11 @@ class BallTracker :
         """Dessine un cercle autour de la balle sur l'image."""
         if ball_data:
             center = ball_data["center"]
-            radius = ball_data["radius"]
-            # Dessine le contour (vert) et le centre (rouge)
-            cv2.circle(frame, center, radius, (0, 255, 0), 2)
+            display_radius = max(ball_data["radius"], 10) 
+            
+            #cercel vert 
+            cv2.circle(frame, center, display_radius, (0, 255, 0), 3)
+            
+            #Centre en ROUGE (-1 pour remplir le cercle)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
         return frame
