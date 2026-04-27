@@ -38,3 +38,13 @@ class Terrain:
             cv2.putText(frame, f"Zone {i+1}", tuple(self.points[start_idx]), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
         return frame
+    
+
+    def is_in_zone(self, point, zone_idx):
+        """Vérifie si un point (x, y) est dans une zone spécifique (0 ou 1)."""
+        start_idx = zone_idx * 8
+        if len(self.points) >= start_idx + 8:
+            pts = np.array(self.points[start_idx:start_idx+8], np.int32)
+            # Retourne True si le point est à l'intérieur ou sur le bord
+            return cv2.pointPolygonTest(pts, point, False) >= 0
+        return False
