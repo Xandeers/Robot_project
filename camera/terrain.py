@@ -32,6 +32,8 @@ class Terrain:
             if len(self.points) < self.max_points:
                 self.points.append((x, y))
                 print(f"Point {len(self.points)} enregistré : ({x}, {y})")
+                if len(self.points) == self.max_points:
+                    self.save_points()
 
     
     def draw_zones(self, frame):
