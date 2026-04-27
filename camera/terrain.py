@@ -24,18 +24,18 @@ class Terrain:
             end_idx = start_idx + 8
         
         
-        if len(self.points) >= end_idx:
+            if len(self.points) >= end_idx:
             # On récupère les 8 points et on les transforme en format NumPy
-            pts = np.array(self.points[start_idx:end_idx], np.int32)
+                pts = np.array(self.points[start_idx:end_idx], np.int32)
             
             # Couleur : Bleu pour Zone 1, Jaune pour Zone 2
-            color = (255, 0, 0) if i == 0 else (0, 255, 255)
+                color = (255, 0, 0) if i == 0 else (0, 255, 255)
             
             # Dessine le polygone à 8 côtés
-            cv2.polylines(frame, [pts], True, color, 2)
+                cv2.polylines(frame, [pts], True, color, 2)
             
             # Affiche le nom de la zone au niveau du premier point cliqué
-            cv2.putText(frame, f"Zone {i+1}", tuple(self.points[start_idx]), 
+                cv2.putText(frame, f"Zone {i+1}", tuple(self.points[start_idx]), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
         return frame
     

@@ -2,6 +2,8 @@ import socket
 import cv2
 import numpy as np
 import struct
+from camera.terrain import Terrain
+
 
 # Configuration
 ip = ""  # listen to all interfaces
@@ -13,6 +15,13 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
 
 print("Listening for UDP frames...")
+
+
+terrain_manager = Terrain(num_zones=2, points_per_zone=8)
+window_name = "Received Frame"
+cv2.namedWindow(window_name)
+
+cv2.setMouseCallback(window_name, terrain_manager.mouse_callback)
 
 data_buffer = {}
 current_frame_id = -1
@@ -34,6 +43,15 @@ while True:
                 frame_buffer = np.frombuffer(frame_data, dtype=np.uint8)
                 frame = cv2.imdecode(frame_buffer,1)
                 if frame is not None:
+
+
+                    frame = terrain_manager.draw_zones(frame)
+                    
+                    #option calibrage
+                    if len(terrain_manager.points) < 16:
+                        cv2.putText(frame, f"Calibration: {len(terrain_manager.points)}/16", 
+                                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        
                     cv2.imshow("Received Frame", frame)
                     ch = chr(cv2.waitKey(int(1)) & 0xFF)
                     if ch=='q' or ch=='Q': break
