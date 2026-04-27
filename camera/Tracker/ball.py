@@ -3,7 +3,7 @@ import cv2
 
 
 
-class Ball : 
+class BallTracker : 
     def __init__(self):
         self.lower_red1 = np.array([0, 120, 70])
         self.upper_red1 = np.array([10, 255, 255])
