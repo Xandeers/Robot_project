@@ -20,3 +20,7 @@ class Coordonee:
         self.y=y
 
 
+    def __repr__(self,p):
+        print(f"({p.x},{p.y})")
+    
+        
