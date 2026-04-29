@@ -3,7 +3,7 @@ import numpy as np
 import json 
 import os
 
-class Terrain:
+class TerrainIMG:
 
     def __init__(self, num_zones=2, points_per_zone=8, filename="points_terrain.json"):
         self.points = []
