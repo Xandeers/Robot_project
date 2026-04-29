@@ -45,6 +45,12 @@ class Graph:
         
 
 
+    def convertir_pixel_en_cm(self, x_pixel, y_pixel, cam_id):
+        matrix = self.matrix_cam1 if cam_id == 1 else self.matrix_cam2
+        
+        point = np.array([[[x_pixel, y_pixel]]], dtype=float)
+        point_cm = cv2.perspectiveTransform(point, matrix)
+        return Coordonee(point_cm[0][0][0], point_cm[0][0][1])
 
 
 
