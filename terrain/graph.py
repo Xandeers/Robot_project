@@ -27,10 +27,17 @@ class Graph:
     def add_point(self,p):
         if 0<= p.x <= self.width and 0<= p.y <= self.length :
             self.point.append(p)
-            return True
         else:
             print("le point hors du terrain")
+            
+
+    def is_inside(self,p):
+        """renvoie vrai ou faux si un point est oui ou non dans le terrain"""
+        if 0<= p.x <= self.width and 0<= p.y <= self.length :
+            return True
+        else:
             return False
+        
 
 
 
