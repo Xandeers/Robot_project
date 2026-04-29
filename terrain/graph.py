@@ -5,6 +5,18 @@ import os
 
 
 
+class Coordonee:
+    def __init__(self,x,y):  
+        self.x=x
+        self.y=y
+
+
+    def __repr__(self,p):
+        print(f"({p.x},{p.y})")
+
+
+
+
 class Graph:
     def __init__(self, x_widthCM=301, y_lengthCM=390):
 
@@ -14,13 +26,8 @@ class Graph:
 
 
 
-class Coordonee:
-    def __init__(self,x,y):  
-        self.x=x
-        self.y=y
 
+    
 
-    def __repr__(self,p):
-        print(f"({p.x},{p.y})")
     
         
