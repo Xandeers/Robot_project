@@ -2,7 +2,7 @@ import socket
 import cv2
 import numpy as np
 import struct
-from camera.terrain import Terrain
+from camera.terrain import TerrainIMG
 from camera.Tracker.ball import BallTracker
 
 
@@ -18,7 +18,7 @@ sock.bind((ip, port))
 print("Listening for UDP frames...")
 
 
-terrain_manager = Terrain(num_zones=2, points_per_zone=8)
+terrain_manager = TerrainIMG(num_zones=2, points_per_zone=8)
 ball_tracker = BallTracker()
 window_name = "Received Frame"
 cv2.namedWindow(window_name)
