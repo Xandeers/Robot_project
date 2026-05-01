@@ -21,7 +21,7 @@ class RobotTracker :
         mask = cv2.erode(mask, kernel, iterations=1)
         mask = cv2.dilate(mask, kernel, iterations=1)
     
-    # Debug pour voir si le robot est bien "blanc" sur le masque
+     #Debug pour voir si le robot est bien "blanc" sur le masque
         cv2.imshow("Debug Masque Robot", mask)
 
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -43,3 +43,17 @@ class RobotTracker :
             }
     
         return robot_data
+
+
+    def drawRobot(self,frame,robot_data):
+
+        if robot_data :
+            center = robot_data["center"]
+            display_radius = max(robot_data["radius"],10)
+        
+            cv2.circle(frame, center, display_radius, (0, 255, 0), 3)
+            
+            #Centre en ROUGE (-1 pour remplir le cercle)
+            cv2.circle(frame, center, 5, (0, 0, 255), -1)
+            
+        return frame
