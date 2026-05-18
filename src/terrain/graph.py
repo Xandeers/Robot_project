@@ -23,6 +23,7 @@ class Graph:
         self.length=y_lengthCM
         self.matrice_cam1=None
         self.matrice_cam2=None
+        self.point = []
     
 
 
@@ -46,7 +47,7 @@ class Graph:
 
 
     def convertir_pixel_to_graph(self, x_pixel, y_pixel, cam_id):
-        matrix = self.matrix_cam1 if cam_id == 1 else self.matrix_cam2
+        matrix = self.matrice_cam1 if cam_id == 1 else self.matrice_cam2
         
         point = np.array([[[x_pixel, y_pixel]]], dtype=float)
         point_cm = cv2.perspectiveTransform(point, matrix)
