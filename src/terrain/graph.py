@@ -11,8 +11,8 @@ class Coordonee:
         self.y=y
 
 
-    def __repr__(self,p):
-        print(f"({p.x},{p.y})")
+    def __repr__(self):
+        print(f"({self.x},{self.y})")
 
 
 
