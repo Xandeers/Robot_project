@@ -71,22 +71,6 @@ def rotation_Droite(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
     returnMotor(motor_avantG,100)
     avanceMotor(motor_arriereG,100)
 
-def glissement_Droit(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
-    
-    #mode diagonale
-    avanceMotor(motor_avantD,100)
-    returnMotor(motor_arriereG,100)
-
-
-    returnMotor(motor_avantG,100)
-    avanceMotor(motor_arriereD,100)
-
-def glissement_Avant_droit(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
-
-   
-    #mode diagonale
-    avanceMotor(motor_avantD,100)
-    returnMotor(motor_arriereG,100)
 
 
 

@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 
 from time import sleep
+import socket
 from ev3dev2.motor import LargeMotor, OUTPUT_A,OUTPUT_B, OUTPUT_C, OUTPUT_D
 
-from src.moteur import *
+from src.robot.module.moteur import *
 from src.socket import creer_et_attendre_connexion, envoyer_message, fermer_reseau
 
-from src.ultrasonicSensor import *
+from src.robot.module.ultrasonicSensor import *
 from ev3dev2.sensor import INPUT_4
 
 from ev3dev2.sound import Sound
+
+
+# Config
+HOST = "0.0.0.0"  
+PORT = 9999
 
 #motor
 mAVD= LargeMotor(OUTPUT_A)

@@ -2,8 +2,9 @@ import socket
 import cv2
 import numpy as np
 import struct
-from camera.terrain import TerrainIMG
-from camera.Tracker.ball import BallTracker
+
+from src.camera.terrain import TerrainIMG
+from src.camera.Tracker.ball import BallTracker
 
 
 # Configuration
