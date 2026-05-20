@@ -73,7 +73,33 @@ class Graph:
         else:
             return False
         
-    
+
+    def afficher_minimap(self, coord_cm=None, echelle=1.5):
+        """
+        Crée une carte 2D du terrain (radar) et place la balle dessus.
+        Utilise automatiquement les dimensions définies dans le Graph.
+        """
+        h = int(self.length * echelle)
+        w = int(self.width * echelle)
+        minimap = np.zeros((h, w, 3), dtype=np.uint8)
+        
+        # contour du terrain blanc
+        cv2.rectangle(minimap, (0, 0), (w-1, h-1), (255, 255, 255), 2)
+        
+        if coord_cm is not None:
+            # Récupérer les coordonnées et appliquer l'échelle
+            x = int(coord_cm.x * echelle)
+            # Inversion de l'axe Y pour l'affichage (OpenCV compte de haut en bas)
+            y = h - int(coord_cm.y * echelle) 
+            
+            # Dessiner la balle (Un cercle rouge plein)
+            cv2.circle(minimap, (x, y), 8, (0, 0, 255), -1) 
+            
+            # Écrire les coordonnées
+            cv2.putText(minimap, f"({int(coord_cm.x)}, {int(coord_cm.y)})", 
+                        (x + 15, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
+        return minimap
 
 
 

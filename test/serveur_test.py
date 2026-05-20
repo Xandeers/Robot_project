@@ -18,7 +18,7 @@ port_video = 8080
 MaximumPacketSize = 1400
 
 # --- Robot EV3 (Envoi) ---
-IP_ROBOT = "192.168.1.50"  # 🔴 REMPLACE PAR L'IP DE TON EV3
+IP_ROBOT = "192.168.1.50"  #IP du robot attention 
 PORT_ROBOT = 9999
 sock_robot = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Socket d'envoi UDP
 

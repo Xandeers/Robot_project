@@ -5,4 +5,3 @@ numpy
 torch 
 torchvision
 gymnasium
-stable-baselines3[extra]
