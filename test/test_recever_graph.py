@@ -159,7 +159,7 @@ while True:
 
                             if coord_cm is not None:
                                 if mon_graph.is_but(coord_cm):
-                            # Écrire en énorme sur la vidéo !
+                            
                                     cv2.putText(frame, "!!! BUT !!!", (200, 200), 
                                         cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 5)
                                     print(" La balle est dans la cage !")
