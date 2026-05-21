@@ -72,5 +72,15 @@ def rotation_Droite(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
     avanceMotor(motor_arriereG,100)
 
 
+def rotation_Gauche(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
+
+    #coté droit avance 
+    returnMotor(motor_avantD,100)
+    avanceMotor(motor_arriereD,100)
+
+    #cote gauche recule
+    avanceMotor(motor_avantG,100)
+    returnMotor(motor_arriereG,100)
+
 
 
