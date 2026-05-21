@@ -34,9 +34,9 @@ def main():
         envoyer_en_continu(client, 0, 3)
         
         # Ordre 2 (PIVOTE DROITE) pendant 3 secondes
-        envoyer_en_continu(client, 2, 1)
+        envoyer_en_continu(client, 1, 5)
         # Ordre 3 (STOP) pendant 2 secondes
-        envoyer_en_continu(client, 3, 1)
+        envoyer_en_continu(client, 2, 1)
         
         envoyer_en_continu(client, 0, 3)
         

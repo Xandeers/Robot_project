@@ -24,6 +24,7 @@ class Graph:
         self.matrice_cam1=None
         self.matrice_cam2=None
         self.point = []
+        self.cage= None 
     
 
 
@@ -74,30 +75,52 @@ class Graph:
             return False
         
 
-    def afficher_minimap(self, coord_cm=None, echelle=1.5):
+    def afficher_minimap(self, coord_balle_cm=None, coord_robot_cm=None, echelle=1.5):
         """
-        Crée une carte 2D du terrain (radar) et place la balle dessus.
+        Crée une carte 2D du terrain (radar) et place la balle et le robot dessus.
         Utilise automatiquement les dimensions définies dans le Graph.
         """
         h = int(self.length * echelle)
         w = int(self.width * echelle)
         minimap = np.zeros((h, w, 3), dtype=np.uint8)
         
-        # contour du terrain blanc
+        # Contour du terrain blanc
         cv2.rectangle(minimap, (0, 0), (w-1, h-1), (255, 255, 255), 2)
         
-        if coord_cm is not None:
+        # --- Dessiner la BALLE (Cercle Rouge) ---
+        if coord_balle_cm is not None:
             # Récupérer les coordonnées et appliquer l'échelle
-            x = int(coord_cm.x * echelle)
+            x = int(coord_balle_cm.x * echelle)
             # Inversion de l'axe Y pour l'affichage (OpenCV compte de haut en bas)
-            y = h - int(coord_cm.y * echelle) 
+            y = h - int(coord_balle_cm.y * echelle) 
             
             # Dessiner la balle (Un cercle rouge plein)
             cv2.circle(minimap, (x, y), 8, (0, 0, 255), -1) 
             
-            # Écrire les coordonnées
-            cv2.putText(minimap, f"({int(coord_cm.x)}, {int(coord_cm.y)})", 
+            # Écrire les coordonnées de la balle
+            cv2.putText(minimap, f"Balle: ({int(coord_balle_cm.x)}, {int(coord_balle_cm.y)})", 
                         (x + 15, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
+        # --- Dessiner le ROBOT (Triangle Vert) ---
+        if coord_robot_cm is not None:
+            # Récupérer les coordonnées et appliquer l'échelle
+            x_rob = int(coord_robot_cm.x * echelle)
+            # Inversion de l'axe Y pour l'affichage
+            y_rob = h - int(coord_robot_cm.y * echelle)
+
+            # Définir les sommets d'un triangle pour représenter le robot
+            taille = 15
+            sommet1 = (x_rob, y_rob - taille)
+            sommet2 = (x_rob - taille, y_rob + taille)
+            sommet3 = (x_rob + taille, y_rob + taille)
+            points_triangle = np.array([sommet1, sommet2, sommet3], np.int32)
+
+            # Dessiner le triangle vert plein
+            cv2.drawContours(minimap, [points_triangle], 0, (0, 255, 0), -1)
+
+            # Écrire les coordonnées du robot
+            cv2.putText(minimap, f"Robot: ({int(coord_robot_cm.x)}, {int(coord_robot_cm.y)})",
+                        (x_rob + 15, y_rob - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
             
         return minimap
 

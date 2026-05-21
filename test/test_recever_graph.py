@@ -5,7 +5,8 @@ import struct
 
 from src.camera.terrain import TerrainIMG
 from src.camera.Tracker.ball import BallTracker
-# Import de ta classe Graph
+from src.camera.Tracker.robot import RobotTracker
+
 from src.terrain.graph import Graph 
 
 # --- Configuration Réseau ---
@@ -20,6 +21,7 @@ print("Listening for UDP frames...")
 # --- Initialisation des modules ---
 terrain_manager = TerrainIMG(num_zones=2, points_per_zone=8)
 ball_tracker = BallTracker()
+robot_tracker = RobotTracker(robot_id=1)
 mon_graph = Graph(x_widthCM=301, y_lengthCM=390)
 is_calibrated = False
 
@@ -105,9 +107,25 @@ while True:
                     # 2. Tracking et Dessin Vidéo
                     ball_info = ball_tracker.get_position(frame)
                     frame = ball_tracker.draw_ball(frame, ball_info)
+
+                    robot_info = robot_tracker.getposition(frame)
+                    frame = robot_tracker.drawRobot(frame,robot_info)
+
                     frame = terrain_manager.draw_zones(frame)
 
-                    coord_cm = None  # Par défaut, pas de balle détectée
+                    coord_cm = None
+                    coord_robot_cm = None #par default rien pour la balle et robot
+
+                    if robot_info:
+                        pos_robot=robot_info["center"]
+
+                        if is_calibrated:
+                            if terrain_manager.is_in_zone(pos_robot, 0):
+                                coord_robot_cm = mon_graph.convertir_pixel_to_graph(pos_robot[0], pos_robot[1], cam_id=1)
+                            
+                            # Test Zone 2 pour le robot
+                            elif terrain_manager.is_in_zone(pos_robot, 1):
+                                coord_robot_cm = mon_graph.convertir_pixel_to_graph(pos_robot[0], pos_robot[1], cam_id=2)
 
                     # 3. Logique Balle (Centimètres & Zones séparées)
                     if ball_info:
@@ -138,7 +156,7 @@ while True:
                                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                         
                     # 4. Affichage de la Minimap Radar
-                    carte_radar = mon_graph.afficher_minimap(coord_cm)
+                    carte_radar = mon_graph.afficher_minimap(coord_balle_cm=coord_cm, coord_robot_cm=coord_robot_cm)
                     cv2.imshow("Radar Terrain Physique (cm)", carte_radar)
                         
                     # 5. Affichage Vidéo Originale

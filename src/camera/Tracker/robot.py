@@ -1,70 +1,85 @@
 import cv2
 import math
-import numpy as np 
+import numpy as np
 
 class RobotTracker:
-    def __init__(self):
+    def __init__(self, aruco_dict_type=cv2.aruco.DICT_4X4_50, robot_id=1):
+        # Initialisation du dictionnaire ArUco. 
+        # (Modifie DICT_4X4_50 selon le marqueur que tu as imprimé)
+        self.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
         
-        self.lower_green = np.array([35, 100, 50])   
-        self.upper_green = np.array([85, 255, 255])
-        
-        self.lower_blue = np.array([100, 100, 50])
-        self.upper_blue = np.array([130, 255, 255])
+        # Gestion de la version d'OpenCV pour les paramètres
+        try:
+            self.aruco_params = cv2.aruco.DetectorParameters()
+        except AttributeError:
+            self.aruco_params = cv2.aruco.DetectorParameters_create()
+            
+        # L'ID spécifique de ton robot
+        self.robot_id = robot_id
+        self.aruco_params.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
+        self.aruco_params.adaptiveThreshWinSizeMin = 3
+        self.aruco_params.adaptiveThreshWinSizeMax = 23
+        self.aruco_params.adaptiveThreshWinSizeStep = 10
+        self.aruco_params.minMarkerPerimeterRate = 0.03 # Accepte les marqueurs plus petits/lointains
 
     def getposition(self, frame):
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        kernel = np.ones((5, 5), np.uint8)
-
-        def find_color_center(mask_in):
-            mask_in = cv2.erode(mask_in, kernel, iterations=1)
-            mask_in = cv2.dilate(mask_in, kernel, iterations=1)
-            cnts, _ = cv2.findContours(mask_in, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            if cnts:
-                largest = max(cnts, key=cv2.contourArea)
-                if cv2.contourArea(largest) > 50:
-                    M = cv2.moments(largest)
-                    if M["m00"] != 0:
-                        return (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            return None
-
+        # ArUco fonctionne mieux sur des images en niveaux de gris
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
-        mask_v = cv2.inRange(hsv, self.lower_green, self.upper_green)
-        mask_b = cv2.inRange(hsv, self.lower_blue, self.upper_blue)
-
-        p_avant = find_color_center(mask_v)
-        p_arriere = find_color_center(mask_b)
+        # Détection des marqueurs
+        corners, ids, rejected = cv2.aruco.detectMarkers(
+            gray, self.aruco_dict, parameters=self.aruco_params
+        )
 
         robot_data = None
 
-        if p_avant and p_arriere:
-           
-            center = ((p_avant[0] + p_arriere[0]) // 2, (p_avant[1] + p_arriere[1]) // 2)
-            
-            
-            angle = math.degrees(math.atan2(p_avant[1] - p_arriere[1], p_avant[0] - p_arriere[0]))
+        if ids is not None:
+            for i, aruco_id in enumerate(ids):
+                # Si on trouve le bon robot
+                if aruco_id[0] == self.robot_id:
+                    # On récupère les 4 coins du marqueur détecté
+                    # Ordre : [Haut-Gauche, Haut-Droite, Bas-Droite, Bas-Gauche]
+                    c = corners[i][0]
+                    
+                    # 1. Calcul du centre (Moyenne des X et moyenne des Y)
+                    center_x = int(np.mean(c[:, 0]))
+                    center_y = int(np.mean(c[:, 1]))
+                    center = (center_x, center_y)
 
-            robot_data = {
-                "center": center,
-                "front": p_avant,
-                "angle": angle
-            }
-    
+                    # 2. Calcul de l'avant (Milieu entre coin 0 et coin 1)
+                    front_x = int((c[0][0] + c[1][0]) / 2)
+                    front_y = int((c[0][1] + c[1][1]) / 2)
+                    front = (front_x, front_y)
+
+                    # 3. Calcul de l'angle d'orientation
+                    angle = math.degrees(math.atan2(front_y - center_y, front_x - center_x))
+
+                    # On formate les données exactement comme ton ancien code
+                    robot_data = {
+                        "center": center,
+                        "front": front,
+                        "angle": angle
+                    }
+                    
+                    break 
+
         return robot_data
 
     
     def drawRobot(self, frame, robot_data):
+        """Dessine les infos du robot sur la frame vidéo"""
         if robot_data:
             center = robot_data["center"]
             front = robot_data["front"]
             
+            # Dessine un point rouge au centre
+            cv2.circle(frame, center, 5, (255, 0, 0), -1)
             
-            cv2.circle(frame, center, 20, (255, 255, 255), 2)
-            
-           
+            # Dessine la flèche de direction en vert
             cv2.arrowedLine(frame, center, front, (0, 255, 0), 3, tipLength=0.3)
             
-            
-            cv2.putText(frame, f"{int(robot_data['angle'])} deg", (center[0]+25, center[1]), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+            # Affiche l'angle
+            cv2.putText(frame, f"{int(robot_data['angle'])} deg", (center[0] + 25, center[1]), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
                 
         return frame
