@@ -23,6 +23,7 @@ terrain_manager = TerrainIMG(num_zones=2, points_per_zone=8)
 ball_tracker = BallTracker()
 robot_tracker = RobotTracker(robot_id=1)
 mon_graph = Graph(x_widthCM=301, y_lengthCM=390)
+mon_graph.set_cage(x_min=100, x_max=200, y_min=370, y_max=390)
 is_calibrated = False
 
 # --- Coordonnées physiques (en centimètres) ---
