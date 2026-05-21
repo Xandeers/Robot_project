@@ -155,6 +155,14 @@ while True:
                                 texte_cm = f"{coord_cm.x:.1f}cm, {coord_cm.y:.1f}cm"
                                 cv2.putText(frame, texte_cm, (pos[0] - 20, pos[1] - 20), 
                                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                                
+
+                            if coord_cm is not None:
+                                if mon_graph.is_but(coord_cm):
+                            # Écrire en énorme sur la vidéo !
+                                    cv2.putText(frame, "!!! BUT !!!", (200, 200), 
+                                        cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 5)
+                                    print(" La balle est dans la cage !")
                         
                     # 4. Affichage de la Minimap Radar
                     carte_radar = mon_graph.afficher_minimap(coord_balle_cm=coord_cm, coord_robot_cm=coord_robot_cm)
