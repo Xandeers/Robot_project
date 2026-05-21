@@ -24,21 +24,37 @@ mon_graph = Graph(x_widthCM=301, y_lengthCM=390)
 is_calibrated = False
 
 # --- Coordonnées physiques (en centimètres) ---
-# À REMPLACER : L'ordre doit correspondre exactement à l'ordre des clics !
+# Ton ordre conservé tel que tu l'as défini et vérifié.
 POINTS_REELS_CM = [
-    # Les 8 points de la Zone 1
-    (0, 0), (50, 0), (50, 50), (0, 50), (10, 10), (20, 20), (30, 30), (40, 40), 
-    # Les 8 points de la Zone 2
-    (100, 0), (150, 0), (150, 50), (100, 50), (110, 10), (120, 20), (130, 30), (140, 40)
+    # --- ZONE 1 (Flux Caméra 1) ---
+    (0, 195),      # 1
+    (150.5, 195),  # 2
+    (301, 195),    # 3
+    (301, 292.5),  # 4
+    (301, 390),    # 5
+    (150.5, 390),  # 6
+    (0, 390),      # 7
+    (0, 292.5),    # 8
+
+    # --- ZONE 2 (Flux Caméra 2 - Inversée) ---
+    (301, 195),    # 9
+    (150.5, 195),  # 10
+    (0, 195),      # 11
+    (0, 97.5),     # 12
+    (0, 0),        # 13
+    (150.5, 0),    # 14
+    (301, 0),      # 15
+    (301, 97.5)    # 16
 ]
 
 # Si le fichier JSON existait, TerrainIMG a déjà chargé les 16 points, 
-# on peut donc calibrer instantanément :
+# on peut donc calibrer instantanément les DEUX matrices :
 if len(terrain_manager.points) == 16:
     try:
-        mon_graph.matriceConfig(terrain_manager.points, POINTS_REELS_CM, id_cam=1)
+        mon_graph.matriceConfig(terrain_manager.points[0:8], POINTS_REELS_CM[0:8], id_cam=1)
+        mon_graph.matriceConfig(terrain_manager.points[8:16], POINTS_REELS_CM[8:16], id_cam=2)
         is_calibrated = True
-        print("Succès : Matrice calibrée instantanément depuis le JSON !")
+        print("Succès : Les DEUX matrices calibrées instantanément depuis le JSON !")
     except Exception as e:
         print(f"Erreur lors de la calibration initiale : {e}")
 
@@ -78,9 +94,11 @@ while True:
                     # Si on vient d'atteindre le 16ème clic
                     elif not is_calibrated:
                         try:
-                            mon_graph.matriceConfig(terrain_manager.points, POINTS_REELS_CM, id_cam=1)
+                            # Séparation des caméras ici aussi
+                            mon_graph.matriceConfig(terrain_manager.points[0:8], POINTS_REELS_CM[0:8], id_cam=1)
+                            mon_graph.matriceConfig(terrain_manager.points[8:16], POINTS_REELS_CM[8:16], id_cam=2)
                             is_calibrated = True
-                            print("Succès : Nouvelle matrice calculée après les clics !")
+                            print("Succès : Les DEUX matrices calculées après les clics !")
                         except Exception as e:
                             print(f"Erreur de matrice : {e}")
 
@@ -91,29 +109,33 @@ while True:
 
                     coord_cm = None  # Par défaut, pas de balle détectée
 
-                    # 3. Logique Balle (Centimètres & Zones)
+                    # 3. Logique Balle (Centimètres & Zones séparées)
                     if ball_info:
                         pos = ball_info["center"]
                         
                         if is_calibrated:
-                            # Conversion Pixel -> Centimètre
-                            coord_cm = mon_graph.convertir_pixel_to_graph(pos[0], pos[1], cam_id=1)
-                            texte_cm = f"{coord_cm.x:.1f}cm, {coord_cm.y:.1f}cm"
+                            # --- Test Zone 1 ---
+                            if terrain_manager.is_in_zone(pos, 0):
+                                coord_cm = mon_graph.convertir_pixel_to_graph(pos[0], pos[1], cam_id=1)
+                                cv2.putText(frame, "BALLE ZONE 1", (50, 50), 
+                                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
                             
-                            # Affichage sur la vidéo
-                            cv2.putText(frame, texte_cm, (pos[0] - 20, pos[1] - 20), 
-                                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                            # --- Test Zone 2 ---
+                            elif terrain_manager.is_in_zone(pos, 1):
+                                coord_cm = mon_graph.convertir_pixel_to_graph(pos[0], pos[1], cam_id=2)
+                                cv2.putText(frame, "BALLE ZONE 2", (50, pos[1] - 50), 
+                                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+                            
+                            # --- Hors zone ---
+                            else:
+                                cv2.putText(frame, "BALLE HORS ZONE", (50, 50), 
+                                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
-                        # Tests d'appartenance aux zones
-                        if terrain_manager.is_in_zone(pos, 0):
-                            cv2.putText(frame, "BALLE ZONE 1", (50, 50), 
-                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                        elif terrain_manager.is_in_zone(pos, 1):
-                            cv2.putText(frame, "BALLE ZONE 2", (50, 50), 
-                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
-                        else:
-                            cv2.putText(frame, "BALLE HORS ZONE", (50, 50), 
-                                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                            # --- Affichage des centimètres ---
+                            if coord_cm is not None:
+                                texte_cm = f"{coord_cm.x:.1f}cm, {coord_cm.y:.1f}cm"
+                                cv2.putText(frame, texte_cm, (pos[0] - 20, pos[1] - 20), 
+                                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                         
                     # 4. Affichage de la Minimap Radar
                     carte_radar = mon_graph.afficher_minimap(coord_cm)
