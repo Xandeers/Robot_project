@@ -30,8 +30,8 @@ def executer_moteurs(action):
         rotation_Droite(mAVD, mAVG, mARD, mARG)
 
     elif action == 2:
-        print("MOTEURS : PIVOTE DROITE")
-        rotation_Droite(mAVD, mAVG, mARD, mARG)
+        print("MOTEURS : PIVOTE Gauche")
+        rotation_Gauche(mAVD, mAVG, mARD, mARG)
 
     elif action == 3:
         print("MOTEURS : STOP")
