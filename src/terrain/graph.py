@@ -124,6 +124,9 @@ class Graph:
             
         return minimap
 
+    def set_cage(self, x_min, x_max, y_min, y_max):
+        """Définit les dimensions physiques de la cage en centimètres"""
+        self.cage = {"xmin": x_min, "xmax": x_max, "ymin": y_min, "ymax": y_max}
 
 
 
