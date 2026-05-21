@@ -79,3 +79,13 @@ class TrajectoryLogic:
             ordre = 0 # AVANCE
 
         return ordre, phase, (point_tir_x, point_tir_y)
+    
+
+    def envoyer_ordre(self, ordre):
+        """Envoie l'ordre au robot"""
+        try:
+            self.sock.sendto(str(ordre).encode('utf-8'), (self.ip_robot, self.port_robot))
+        except Exception as e:
+            print(f"Erreur UDP: {e}")
+            
+        return self.textes_ordres.get(ordre, "INCONNU")
