@@ -122,6 +122,19 @@ class Graph:
             cv2.putText(minimap, f"Robot: ({int(coord_robot_cm.x)}, {int(coord_robot_cm.y)})",
                         (x_rob + 15, y_rob - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
             
+        if self.cage is not None:
+            # Convertir les centimètres de la cage en pixels radar
+            x1 = int(self.cage["xmin"] * echelle)
+            y1 = h - int(self.cage["ymin"] * echelle)
+            x2 = int(self.cage["xmax"] * echelle)
+            y2 = h - int(self.cage["ymax"] * echelle)
+            
+            # Dessiner le rectangle
+            cv2.rectangle(minimap, (x1, y1), (x2, y2), (0, 165, 255), 3)
+            # Écrire "CAGE"
+            cv2.putText(minimap, "CAGE", (min(x1, x2), min(y1, y2) - 10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 165, 255), 2)
+            
         return minimap
 
     def set_cage(self, x_min, x_max, y_min, y_max):
@@ -138,6 +151,9 @@ class Graph:
         dans_y = self.cage["ymin"] <= coord_balle_cm.y <= self.cage["ymax"]
         
         return dans_x and dans_y
+
+
+    
 
     
 
