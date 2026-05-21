@@ -129,6 +129,15 @@ class Graph:
         self.cage = {"xmin": x_min, "xmax": x_max, "ymin": y_min, "ymax": y_max}
 
 
+    def is_but(self, coord_balle_cm):
+        """Vérifie si les coordonnées de la balle sont à l'intérieur de la cage"""
+        if not self.cage or not coord_balle_cm:
+            return False
+        
+        dans_x = self.cage["xmin"] <= coord_balle_cm.x <= self.cage["xmax"]
+        dans_y = self.cage["ymin"] <= coord_balle_cm.y <= self.cage["ymax"]
+        
+        return dans_x and dans_y
 
     
 
