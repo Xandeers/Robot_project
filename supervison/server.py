@@ -26,3 +26,6 @@ def envoye(robot_x, robot_y, robot_angle, ball_x, ball_y, phase, ordre):
 
     Socketio.emit('update',data)
 
+def _demarrer_serveur():
+    
+    Socketio.run(app, host='0.0.0.0', port=5000, log_output=False)
