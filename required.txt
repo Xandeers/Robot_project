@@ -5,3 +5,5 @@ numpy
 torch 
 torchvision
 gymnasium
+flask 
+flask-socketio
