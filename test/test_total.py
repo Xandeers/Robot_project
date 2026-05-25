@@ -29,8 +29,7 @@ robot_tracker = RobotTracker(robot_id=1)
 mon_graph = Graph(x_widthCM=301, y_lengthCM=390)
 mon_graph.set_cage(x_min=100, x_max=200, y_min=370, y_max=390)
 
-# --- INITIALISATION DE L'IA (Envoi vers EV3) ---
-# /!\ REMPLACE L'IP PAR CELLE DE TON EV3 /!\
+# Envoi vers EV3 
 ia_trajectoire = TrajectoryLogic(ip_robot=IP_ROBOT, port_robot=9999) 
 
 is_calibrated = False
