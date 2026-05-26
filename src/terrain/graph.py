@@ -13,7 +13,9 @@ class Coordonee:
 
 
     def __repr__(self):
-        print(f"({self.x},{self.y})")
+        if self.angle is not None:
+            return f"({self.x:.1f}, {self.y:.1f}, {self.angle:.1f}°)"
+        return f"({self.x:.1f}, {self.y:.1f})"
 
 
 
