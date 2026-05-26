@@ -50,13 +50,25 @@ class Graph:
         
 
 
-    def convertir_pixel_to_graph(self, x_pixel, y_pixel, cam_id):
+    def convertir_pixel_to_graph(self, x_pixel, y_pixel, cam_id, angle_cam=None):
         matrix = self.matrice_cam1 if cam_id == 1 else self.matrice_cam2
         
         point = np.array([[[x_pixel, y_pixel]]], dtype=float)
         point_cm = cv2.perspectiveTransform(point, matrix)
-        return Coordonee(point_cm[0][0][0], point_cm[0][0][1])
-
+        
+       
+        angle_physique = None
+        if angle_cam is not None:
+            if cam_id == 1:
+                # Caméra 1 : Inversion de l'axe Y (Pixels vers Graph)
+                angle_physique = -angle_cam
+            elif cam_id == 2:
+                # Caméra 2 (Inversée) : Inversion Y + Demi-tour (180°)
+                angle_physique = -angle_cam + 180
+                # On force l'angle à rester entre -180 et 180 pour que l'IA ne panique pas
+                angle_physique = (angle_physique + 180) % 360 - 180
+                
+        return Coordonee(point_cm[0][0][0], point_cm[0][0][1], angle=angle_physique)
 
 
 
