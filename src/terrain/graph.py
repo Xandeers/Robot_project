@@ -6,9 +6,10 @@ import os
 
 
 class Coordonee:
-    def __init__(self,x,y):  
+    def __init__(self,x,y, angle=None):  
         self.x=x
         self.y=y
+        self.angle=angle
 
 
     def __repr__(self):
