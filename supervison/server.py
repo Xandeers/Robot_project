@@ -20,7 +20,7 @@ def envoye(robot_x, robot_y, robot_angle, ball_x, ball_y, phase, ordre):
         "robot_angle": robot_angle,
         "ball_x": ball_x,
         "ball_y":ball_y,
-        "pahse": phase,
+        "phase": phase,
         "ordre": ordre
     }
 
