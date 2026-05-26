@@ -1,13 +1,10 @@
 import math
 import socket
 
-CENTRE_CAGE_X= 150
-CENTRE_CAGE_Y= 390
-DISTANCE_RECULE_CM =30
-TOLERANCE_DST=15
-TOLERANCE_ANGL=15
-
-
+CENTRE_CAGE_X = 150
+CENTRE_CAGE_Y = 390
+DISTANCE_RECULE_CM = 30
+TOLERANCE_DST = 15
 
 class TrajectoryLogic:
     def __init__(self, ip_robot, port_robot=9999):
@@ -17,69 +14,70 @@ class TrajectoryLogic:
         
         self.textes_ordres = {0: "AVANCE", 1: "DROITE", 2: "GAUCHE", 3: "STOP"}
         
-        # param terrain
+        # Paramètres terrain
         self.centre_cage_x = CENTRE_CAGE_X
         self.centre_cage_y = CENTRE_CAGE_Y
         
-        # distancce  deriere la balle 
+        # Distance derrière la balle pour s'aligner
         self.distance_recul = DISTANCE_RECULE_CM
         
-        # Tolérance 
+        # Tolérance de distance au point de tir
         self.tolerance_distance = TOLERANCE_DST
 
-    
-    def calculer_ordre(self, robot_info, coord_robot_cm, coord_balle_cm):
-        if not coord_robot_cm or not coord_balle_cm or not robot_info:
+        # Mémoire de mouvement pour la logique d'hystérésis
+        self.en_mouvement = False
+
+    def calculer_ordre(self, coord_robot_cm, coord_balle_cm):
+        # MODIFIÉ : On a supprimé robot_info des paramètres et des vérifications
+        if not coord_robot_cm or not coord_balle_cm:
             return 3, "PERTE CIBLE", None 
         
-        # calcul pts de tir
-        # Vect de la cage et vers balle
+        # --- 1. CALCUL DU POINT DE TIR IDÉAL ---
         vect_x = coord_balle_cm.x - self.centre_cage_x
         vect_y = coord_balle_cm.y - self.centre_cage_y
-        
-        # Angle
         angle_vecteur = math.atan2(vect_y, vect_x)
         
-        # Crea du pts de tir dans alignement, derrière la balle
         point_tir_x = coord_balle_cm.x + (math.cos(angle_vecteur) * self.distance_recul)
         point_tir_y = coord_balle_cm.y + (math.sin(angle_vecteur) * self.distance_recul)
 
-        
-        # choix cible 
-        # dist robot et pts de tir
+        # --- 2. CHOIX DE LA CIBLE (ALIGNEMENT OU FRAPPE) ---
         dist_robot_pt_tir = math.hypot(point_tir_x - coord_robot_cm.x, point_tir_y - coord_robot_cm.y)
         
-        
         if dist_robot_pt_tir > self.tolerance_distance:
-            #trop loin dcp vise pts de tir
+            # Trop loin, on vise le point derrière la balle pour la contourner
             cible_x = point_tir_x
             cible_y = point_tir_y
             phase = "ALIGNEMENT"
         else:
-            # ok alors on fappe 
+            # En position, on fonce sur la balle pour marquer
             cible_x = coord_balle_cm.x
             cible_y = coord_balle_cm.y
             phase = "!!! FRAPPE !!!"
         
-        # pilotage vers cible 
+        # --- 3. PILOTAGE VERS LA CIBLE ---
         dx = cible_x - coord_robot_cm.x
         dy = cible_y - coord_robot_cm.y
         angle_cible = math.degrees(math.atan2(dy, dx))
 
-        angle_robot = robot_info["angle"]
+        # MODIFIÉ : L'IA lit directement l'angle physique unifié stocké dans le Graph !
+        angle_robot = coord_robot_cm.angle 
+        
         diff_angle = (angle_cible - angle_robot + 180) % 360 - 180
 
-        marge_erreur_angle = TOLERANCE_ANGL
+        # AJUSTÉ : Marges pour favoriser les lignes droites (45° en roulant, 20° au pivot)
+        marge_erreur = 45 if self.en_mouvement else 20
 
-        if diff_angle > marge_erreur_angle:
+        if diff_angle > marge_erreur:
+            ordre = 2 # PIVOTE GAUCHE
+            self.en_mouvement = False
+        elif diff_angle < -marge_erreur:
             ordre = 1 # PIVOTE DROITE
-        elif diff_angle < -marge_erreur_angle:
-            ordre = 2 # PIVOTE GAUCHE 
+            self.en_mouvement = False
         else:
             ordre = 0 # AVANCE
+            self.en_mouvement = True
 
         return ordre, phase, (point_tir_x, point_tir_y)
-    
 
     def envoyer_ordre(self, ordre):
         """Envoie l'ordre au robot"""
