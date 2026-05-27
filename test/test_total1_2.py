@@ -65,7 +65,7 @@ zone_active_robot = 0
 robot_filtre_x = None
 robot_filtre_y = None
 robot_filtre_angle = None
-ALPHA = 0.25  # Force du lissage (0.25 = très lisse, 0.8 = très réactif)
+ALPHA = 0.90  # Force du lissage (0.25 = très lisse, 0.8 = très réactif)
 
 
 # --- Boucle Principale ---

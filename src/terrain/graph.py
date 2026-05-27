@@ -81,9 +81,9 @@ class Graph:
         else:
             return False
         
-    def afficher_minimap(self, coord_balle_cm=None, coord_robot_cm=None, echelle=1.5):
+    def afficher_minimap(self, coord_balle_cm=None, coord_robot_cm=None, coord_enemies_cm=None, echelle=1.5):
         """
-        Crée une carte 2D du terrain (radar) et place la balle et le robot dessus.
+        Crée une carte 2D du terrain (radar) et place la balle, le robot et les ennemis dessus.
         Utilise automatiquement les dimensions définies dans le Graph.
         """
         h = int(self.length * echelle)
@@ -98,7 +98,7 @@ class Graph:
             # Récupérer les coordonnées et appliquer l'échelle
             x = int(coord_balle_cm.x * echelle)
             # Inversion de l'axe Y pour l'affichage (OpenCV compte de haut en bas)
-            y = h - int(coord_balle_cm.y * echelle) 
+            y = int(h - (coord_balle_cm.y * echelle))
             
             # Dessiner la balle (Un cercle rouge plein)
             cv2.circle(minimap, (x, y), 8, (0, 0, 255), -1) 
@@ -112,38 +112,54 @@ class Graph:
             # Récupérer les coordonnées et appliquer l'échelle
             x_rob = int(coord_robot_cm.x * echelle)
             # Inversion de l'axe Y pour l'affichage
-            y_rob = h - int(coord_robot_cm.y * echelle)
+            y_rob = int(h - (coord_robot_cm.y * echelle))
 
-            # 1. Dessiner le corps du robot (Cercle Cyan)
+            # Dessiner le corps du robot (Cercle Cyan)
             cv2.circle(minimap, (x_rob, y_rob), 12, (255, 255, 0), -1)
 
-            # 2. Dessiner la direction (Le "nez" du robot)
+            # Dessiner la direction (Le "nez" du robot)
             if coord_robot_cm.angle is not None:
                 angle_rad = math.radians(coord_robot_cm.angle)
                 longueur_ligne = 25
                 
                 # Mathématiques pour trouver le bout de la ligne
-                # (On fait - sin() car l'axe Y de l'écran OpenCV est inversé vers le bas)
                 fin_x = x_rob + int(longueur_ligne * math.cos(angle_rad))
                 fin_y = y_rob - int(longueur_ligne * math.sin(angle_rad))
                 
                 # Tracer une ligne rouge épaisse qui pointe vers l'avant
                 cv2.line(minimap, (x_rob, y_rob), (fin_x, fin_y), (0, 0, 255), 3)
 
-            # 3. Écrire les coordonnées ET l'angle
+            #Écrire les coordonnées ET l'angle 
             texte_infos = f"Rob: ({int(coord_robot_cm.x)}, {int(coord_robot_cm.y)})"
             if coord_robot_cm.angle is not None:
                 texte_infos += f" | {int(coord_robot_cm.angle)} deg"
                 
             cv2.putText(minimap, texte_infos, (x_rob + 15, y_rob - 25), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+
+
+        # --- NOUVEAU : Dessiner les ENNEMIS (Cercles Violets) ---
+        if coord_enemies_cm is not None:
+            for enemy_data in coord_enemies_cm:
+                en_id = enemy_data["id"]
+                en_coord = enemy_data["coord"]
+                
+                # Conversion en pixels écran
+                x_en = int(en_coord.x * echelle)
+                y_en = int(h - (en_coord.y * echelle))
+                
+                # Un gros cercle violet
+                cv2.circle(minimap, (x_en, y_en), 14, (255, 0, 255), -1)
+                # Affichage de son ID au-dessus
+                cv2.putText(minimap, f"E{en_id}", (x_en - 15, y_en - 20), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 2)
             
         if self.cage is not None:
             # Convertir les centimètres de la cage en pixels radar
             x1 = int(self.cage["xmin"] * echelle)
-            y1 = h - int(self.cage["ymin"] * echelle)
+            y1 = int(h - (self.cage["ymin"] * echelle))
             x2 = int(self.cage["xmax"] * echelle)
-            y2 = h - int(self.cage["ymax"] * echelle)
+            y2 = int(h - (self.cage["ymax"] * echelle))
             
             # Dessiner le rectangle
             cv2.rectangle(minimap, (x1, y1), (x2, y2), (0, 165, 255), 3)
