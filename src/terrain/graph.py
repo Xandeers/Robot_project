@@ -81,9 +81,9 @@ class Graph:
         else:
             return False
         
-    def afficher_minimap(self, coord_balle_cm=None, coord_robot_cm=None, coord_enemies_cm=None, echelle=1.5):
+    def afficher_minimap(self, coord_balle_cm=None, coord_robot_cm=None, coord_enemies_cm=None, coord_allies_cm=None, echelle=1.5):
         """
-        Crée une carte 2D du terrain (radar) et place la balle, le robot et les ennemis dessus.
+        Crée une carte 2D du terrain (radar) et place la balle, le robot, les ennemis et les alliés dessus.
         Utilise automatiquement les dimensions définies dans le Graph.
         """
         h = int(self.length * echelle)
@@ -98,7 +98,7 @@ class Graph:
             # Récupérer les coordonnées et appliquer l'échelle
             x = int(coord_balle_cm.x * echelle)
             # Inversion de l'axe Y pour l'affichage (OpenCV compte de haut en bas)
-            y = int(h - (coord_balle_cm.y * echelle))
+            y = h - int(coord_balle_cm.y * echelle) 
             
             # Dessiner la balle (Un cercle rouge plein)
             cv2.circle(minimap, (x, y), 8, (0, 0, 255), -1) 
@@ -112,7 +112,7 @@ class Graph:
             # Récupérer les coordonnées et appliquer l'échelle
             x_rob = int(coord_robot_cm.x * echelle)
             # Inversion de l'axe Y pour l'affichage
-            y_rob = int(h - (coord_robot_cm.y * echelle))
+            y_rob = h - int(coord_robot_cm.y * echelle)
 
             # Dessiner le corps du robot (Cercle Cyan)
             cv2.circle(minimap, (x_rob, y_rob), 12, (255, 255, 0), -1)
@@ -146,20 +146,36 @@ class Graph:
                 
                 # Conversion en pixels écran
                 x_en = int(en_coord.x * echelle)
-                y_en = int(h - (en_coord.y * echelle))
+                y_en = h - int(en_coord.y * echelle)
                 
                 # Un gros cercle violet
                 cv2.circle(minimap, (x_en, y_en), 14, (255, 0, 255), -1)
                 # Affichage de son ID au-dessus
                 cv2.putText(minimap, f"E{en_id}", (x_en - 15, y_en - 20), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 2)
+
+        # --- NOUVEAU : Dessiner les ALLIÉS (Cercles Verts) ---
+        if coord_allies_cm is not None:
+            for ally_data in coord_allies_cm:
+                al_id = ally_data["id"]
+                al_coord = ally_data["coord"]
+                
+                # Conversion en pixels écran
+                x_al = int(al_coord.x * echelle)
+                y_al = h - int(al_coord.y * echelle)
+                
+                # Un gros cercle vert
+                cv2.circle(minimap, (x_al, y_al), 14, (0, 255, 0), -1)
+                # Affichage de son ID au-dessus
+                cv2.putText(minimap, f"A{al_id}", (x_al - 15, y_al - 20), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             
         if self.cage is not None:
             # Convertir les centimètres de la cage en pixels radar
             x1 = int(self.cage["xmin"] * echelle)
-            y1 = int(h - (self.cage["ymin"] * echelle))
+            y1 = h - int(self.cage["ymin"] * echelle)
             x2 = int(self.cage["xmax"] * echelle)
-            y2 = int(h - (self.cage["ymax"] * echelle))
+            y2 = h - int(self.cage["ymax"] * echelle)
             
             # Dessiner le rectangle
             cv2.rectangle(minimap, (x1, y1), (x2, y2), (0, 165, 255), 3)
