@@ -64,23 +64,23 @@ def stopVehicule(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
 def rotation_Droite(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
 
     #coté droit avance 
-    avanceMotor(motor_avantD,100)
-    returnMotor(motor_arriereD,100)
+    avanceMotor(motor_avantD,10)
+    returnMotor(motor_arriereD,10)
 
     #cote gauche recule
-    returnMotor(motor_avantG,100)
-    avanceMotor(motor_arriereG,100)
+    returnMotor(motor_avantG,10)
+    avanceMotor(motor_arriereG,10)
 
 
 def rotation_Gauche(motor_avantD, motor_avantG, motor_arriereD, motor_arriereG):
 
     #coté droit avance 
-    returnMotor(motor_avantD,100)
-    avanceMotor(motor_arriereD,100)
+    returnMotor(motor_avantD,10)
+    avanceMotor(motor_arriereD,10)
 
     #cote gauche recule
-    avanceMotor(motor_avantG,100)
-    returnMotor(motor_arriereG,100)
+    avanceMotor(motor_avantG,10)
+    returnMotor(motor_arriereG,10)
 
 
 

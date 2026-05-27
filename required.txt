@@ -1,9 +1,11 @@
 pillow==12.1.1
 python-ev3dev2==2.1.0.post1
-opencv-python
+opencv-contrib-python
 numpy
 torch 
 torchvision
-gymnasium
-flask 
-flask-socketio
+gymnasium==1.2.3
+stable-baselines3
+Flask
+Flask-SocketIO
+eventlet

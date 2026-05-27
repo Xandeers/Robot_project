@@ -44,7 +44,7 @@ def main():
     
     serveur.settimeout(0.5)
     
-    print(f"Robot EV3 allumé en UDP. En attente des ordres sur le port {PORT}...")
+    print("Robot EV3 allumé en UDP. En attente des ordres sur le port {}...".format(PORT))
     
     try:
         while True:
@@ -68,7 +68,7 @@ def main():
     except KeyboardInterrupt:
         print("\nArrêt manuel demandé par l'utilisateur.")
     except Exception as e:
-        print(f"Erreur d'exécution : {e}")
+        print("Erreur d'exécution : {}".format(e))
     finally:
         print("Arrêt d'urgence des moteurs.")
         executer_moteurs(3) 

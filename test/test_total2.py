@@ -8,10 +8,11 @@ from src.camera.Tracker.ball import BallTracker
 from src.camera.Tracker.robot import RobotTracker
 from src.robot.logic.trajectoire import TrajectoryLogic
 from src.terrain.graph import Graph 
+from supervison.server import lancer_dashbord, envoye
 
+lancer_dashbord()
 
-
-IP_ROBOT="172.20.10.3"
+IP_ROBOT="172.20.10.11"
 
 # --- Configuration Réseau (Réception Vidéo) ---
 ip = ""  
@@ -140,6 +141,15 @@ while True:
                         # Le PC envoie directement l'ordre au robot
                         nom_ordre = ia_trajectoire.envoyer_ordre(ordre)
                         
+                        envoye(
+                            robot_x=coord_robot_cm.x,
+                            robot_y=coord_robot_cm.y,
+                            robot_angle=coord_robot_cm.angle,
+                            ball_x=coord_cm.x,
+                            ball_y=coord_cm.y,
+                            phase=phase,
+                            ordre=ordre
+                        )
                         # Affichage sur l'écran
                         cv2.putText(frame, f"Phase: {phase}", (10, 80), 
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
