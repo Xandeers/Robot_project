@@ -138,7 +138,7 @@ class Graph:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
 
 
-        # --- NOUVEAU : Dessiner les ENNEMIS (Cercles Violets) ---
+        #  Dessiner les ENNEMIS (Cercles Violets) ---
         if coord_enemies_cm is not None:
             for enemy_data in coord_enemies_cm:
                 en_id = enemy_data["id"]
@@ -154,7 +154,7 @@ class Graph:
                 cv2.putText(minimap, f"E{en_id}", (x_en - 15, y_en - 20), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 2)
 
-        # --- NOUVEAU : Dessiner les ALLIÉS (Cercles Verts) ---
+        #  Dessiner les ALLIÉS (Cercles Verts) ---
         if coord_allies_cm is not None:
             for ally_data in coord_allies_cm:
                 al_id = ally_data["id"]
