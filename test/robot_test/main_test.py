@@ -3,7 +3,6 @@ from time import sleep
 from ev3dev2.motor import LargeMotor, OUTPUT_A,OUTPUT_B, OUTPUT_C, OUTPUT_D
 
 from src.robot.module.moteur import *
-from src.socket import creer_et_attendre_connexion, envoyer_message, fermer_reseau
 from src.robot.module.ultrasonicSensor import *
 from ev3dev2.sensor import INPUT_4
 from ev3dev2.sound import Sound
@@ -17,6 +16,8 @@ mAVD = LargeMotor(OUTPUT_A)
 mAVG = LargeMotor(OUTPUT_B)
 mARD = LargeMotor(OUTPUT_C)
 mARG = LargeMotor(OUTPUT_D)
+
+haut_parleur=Sound()
 
 def executer_moteurs(action):
     """Traduit l'ordre reçu en mouvement physique"""
@@ -36,6 +37,13 @@ def executer_moteurs(action):
     elif action == 3:
         print("MOTEURS : STOP")
         stopVehicule(mAVD, mAVG, mARD, mARG)
+    
+    elif action == 4:
+        haut_parleur.play_file('src/audio/ev3_Si_di_jaloux.wav', play_type=Sound.PLAY_NO_WAIT_FOR_COMPLETE)
+    
+    elif action == 5:
+        haut_parleur.play_file('src/audio/ev3_Tahan_farhan.wav', play_type=Sound.PLAY_NO_WAIT_FOR_COMPLETE)
+
 
 def main():
     

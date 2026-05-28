@@ -1,10 +1,10 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supervision Match EV3 — Contrôle Tactique</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -18,7 +18,7 @@
     <header class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur px-6 py-4 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-3">
             <div class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
-            <h1 class="text-lg font-bold tracking-wider text-zinc-200">EV3_TELEMETRY_SYSTEM v2.0</h1>
+            <h1 class="text-lg font-bold tracking-wider text-zinc-200">EV3_TELEMETRY_SYSTEM v3.0</h1>
         </div>
         <div class="text-xs text-zinc-400 bg-zinc-800 px-3 py-1 rounded border border-zinc-700">
             Flux Web-Socket actif (5000)
@@ -44,11 +44,11 @@
             </div>
 
             <div class="bg-zinc-900/40 border border-zinc-800 rounded-xl p-5 shadow-md backdrop-blur flex-1 flex flex-col justify-between my-2">
-                <h2 class="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-4">Coordonnées Réelles (CM)</h2>
+                <h2 class="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-4">Télémétrie Terrain (CM)</h2>
                 
                 <div class="space-y-4">
                     <div class="border-l-2 border-sky-500 pl-3">
-                        <div class="text-xs font-bold text-sky-400 uppercase">Robot Châssis</div>
+                        <div class="text-xs font-bold text-sky-400 uppercase">Robot Idefix</div>
                         <div class="grid grid-cols-3 gap-2 mt-1 text-sm">
                             <div>X: <span id="robot-x" class="font-bold text-zinc-300">0</span></div>
                             <div>Y: <span id="robot-y" class="font-bold text-zinc-300">0</span></div>
@@ -57,16 +57,17 @@
                     </div>
 
                     <div class="border-l-2 border-orange-500 pl-3">
-                        <div class="text-xs font-bold text-orange-400 uppercase">Vecteur Balle</div>
-                        <div class="grid grid-cols-2 gap-2 mt-1 text-sm">
+                        <div class="text-xs font-bold text-orange-400 uppercase">Balle & État</div>
+                        <div class="grid grid-cols-3 gap-2 mt-1 text-sm">
                             <div>X: <span id="ball-x" class="font-bold text-zinc-300">0</span></div>
                             <div>Y: <span id="ball-y" class="font-bold text-zinc-300">0</span></div>
+                            <div id="ball-status" class="font-bold text-emerald-400">EN JEU</div>
                         </div>
                     </div>
                     
                     <div class="border-l-2 border-zinc-700 pl-3 text-xs text-zinc-500">
-                        Dimensions Terrain : 301cm × 390cm<br>
-                        But Adverse : X=150, Y=390
+                        Dimensions : 301cm × 390cm<br>
+                        Cage : X=150, Y=390
                     </div>
                 </div>
             </div>
@@ -74,7 +75,7 @@
 
         <div class="lg:col-span-2 bg-zinc-900/20 border border-zinc-800 rounded-xl p-4 flex flex-col items-center justify-center shadow-inner relative">
             <div class="absolute top-4 left-4 text-xs text-zinc-500 uppercase tracking-wider">
-                Visualisation Terrain OpenCV -> Canvas
+                Visualisation Radar Tactique
             </div>
             
             <canvas id="fieldCanvas" width="301" height="390" class="bg-zinc-900/60 border border-zinc-800 rounded shadow-2xl max-w-full max-h-[70vh]"></canvas>
@@ -83,23 +84,20 @@
     </main>
 
     <script>
-        // 1. Connexion au serveur WebSocket de Flask
         const socket = io();
 
-        // Récupération des éléments du DOM
         const lblRobotX = document.getElementById('robot-x');
         const lblRobotY = document.getElementById('robot-y');
         const lblRobotAngle = document.getElementById('robot-angle');
         const lblBallX = document.getElementById('ball-x');
         const lblBallY = document.getElementById('ball-y');
+        const lblBallStatus = document.getElementById('ball-status');
         const lblPhase = document.getElementById('statut-phase');
         const lblOrdre = document.getElementById('statut-ordre');
 
-        // Configuration du Canvas pour le dessin
         const canvas = document.getElementById('fieldCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Dictionnaire de traduction des ordres numériques
         const dictionnaireOrdres = {
             0: "AVANCE (0)",
             1: "PIVOTE DROITE (1)",
@@ -107,82 +105,130 @@
             3: "STOP (3)"
         };
 
-        // 2. Écoute de l'événement 'update' envoyé par le script Python
         socket.on('update', function(data) {
             
-            // Mise à jour des données textuelles du tableau de bord
             lblRobotX.innerText = Math.round(data.robot_x);
             lblRobotY.innerText = Math.round(data.robot_y);
             lblRobotAngle.innerText = Math.round(data.robot_angle) + "°";
             lblBallX.innerText = Math.round(data.ball_x);
             lblBallY.innerText = Math.round(data.ball_y);
             
-            // Gestion de la faille ou de la correction de la variable "phase" / "pahse"
-            lblPhase.innerText = data.phase || data.pahse || "INCONNU";
+            lblPhase.innerText = data.phase || "INCONNU";
             lblOrdre.innerText = dictionnaireOrdres[data.ordre] || "INCONNU";
 
-            // Redessiner le terrain de jeu complet avec les nouvelles coordonnées
+            // Gestion de l'alerte HORS-JEU
+            if (data.balle_en_jeu === false) {
+                lblBallStatus.innerText = "HORS-JEU ⚠️";
+                lblBallStatus.className = "font-bold text-red-500 animate-pulse";
+            } else {
+                lblBallStatus.innerText = "EN JEU";
+                lblBallStatus.className = "font-bold text-emerald-400";
+            }
+
             drawField(data);
         });
 
         function drawField(data) {
-            // Nettoyage complet du Canvas avant chaque dessin
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dessin des lignes du terrain (Style Radar Vert Tactique clair)
+            // Terrain (Vert Radar)
             ctx.strokeStyle = "rgba(16, 185, 129, 0.2)";
             ctx.lineWidth = 2;
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
             
-            // Ligne médiane
             ctx.beginPath();
             ctx.moveTo(0, canvas.height / 2);
             ctx.lineTo(canvas.width, canvas.height / 2);
             ctx.stroke();
 
-            // Rond central
             ctx.beginPath();
             ctx.arc(canvas.width / 2, canvas.height / 2, 40, 0, 2 * Math.PI);
             ctx.stroke();
 
-            // Dessin de la cage adverse (Position Y=390, donc tout en bas du repère)
-            ctx.fillStyle = "rgba(239, 68, 68, 0.4)"; // Rouge transparent
+            // Cage
+            ctx.fillStyle = "rgba(239, 68, 68, 0.4)";
             ctx.fillRect(canvas.width / 2 - 30, canvas.height - 10, 60, 10);
             ctx.strokeStyle = "#ef4444";
             ctx.strokeRect(canvas.width / 2 - 30, canvas.height - 10, 60, 10);
 
-            // 3. Dessin de la BALLE (Orange Néon)
+            // --- NOUVEAU : Dessin de la Trajectoire Cible (Ligne Jaune Pointillée) ---
+            if (data.robot_x && data.robot_y && data.cible_x && data.cible_y) {
+                ctx.beginPath();
+                ctx.moveTo(data.robot_x, data.robot_y);
+                ctx.lineTo(data.cible_x, data.cible_y);
+                ctx.strokeStyle = "rgba(253, 224, 71, 0.5)"; // Jaune transparent
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]); // Pointillés
+                ctx.stroke();
+                ctx.setLineDash([]); // Reset des pointillés
+
+                // Croix sur la cible
+                ctx.beginPath();
+                ctx.arc(data.cible_x, data.cible_y, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = "#fde047";
+                ctx.fill();
+            }
+
+            // --- NOUVEAU : Dessin des Ennemis (Violets) ---
+            if (data.enemies && data.enemies.length > 0) {
+                data.enemies.forEach(en => {
+                    ctx.beginPath();
+                    ctx.arc(en.x, en.y, 14, 0, 2 * Math.PI);
+                    ctx.fillStyle = "rgba(168, 85, 247, 0.8)";
+                    ctx.fill();
+                    
+                    // Texte ID
+                    ctx.fillStyle = "white";
+                    ctx.font = "10px 'JetBrains Mono'";
+                    ctx.fillText("E" + en.id, en.x - 6, en.y + 3);
+                });
+            }
+
+            // --- NOUVEAU : Dessin des Alliés (Verts) ---
+            if (data.allies && data.allies.length > 0) {
+                data.allies.forEach(al => {
+                    ctx.beginPath();
+                    ctx.arc(al.x, al.y, 14, 0, 2 * Math.PI);
+                    ctx.fillStyle = "rgba(34, 197, 94, 0.8)";
+                    ctx.fill();
+                    
+                    // Texte ID
+                    ctx.fillStyle = "white";
+                    ctx.font = "10px 'JetBrains Mono'";
+                    ctx.fillText("A" + al.id, al.x - 6, al.y + 3);
+                });
+            }
+
+            // Dessin de la BALLE
             if (data.ball_x && data.ball_y) {
                 ctx.beginPath();
                 ctx.arc(data.ball_x, data.ball_y, 8, 0, 2 * Math.PI);
-                ctx.fillStyle = "#f97316"; // Orange
+                ctx.fillStyle = "#f97316"; 
                 ctx.shadowColor = "#f97316";
                 ctx.shadowBlur = 10;
                 ctx.fill();
-                ctx.shadowBlur = 0; // Reset shadow pour les autres dessins
+                ctx.shadowBlur = 0; 
             }
 
-            // 4. Dessin du ROBOT (Bleu Néon avec flèche directionnelle)
+            // Dessin du ROBOT Idefix
             if (data.robot_x && data.robot_y) {
                 ctx.save();
-                // On déplace le repère du dessin au centre du robot
                 ctx.translate(data.robot_x, data.robot_y);
-                // On applique la rotation (conversion des degrés en radians requis par le Canvas)
-                ctx.rotate(data.robot_x * Math.PI / 180);
+                
+                // CORRECTION DU BUG DE ROTATION : On utilise robot_angle (inversé pour le canvas)
+                ctx.rotate(-data.robot_angle * Math.PI / 180);
 
-                // Corps du robot (Cercle bleu)
                 ctx.beginPath();
                 ctx.arc(0, 0, 12, 0, 2 * Math.PI);
-                ctx.fillStyle = "#0ea5e9"; // Bleu ciel
+                ctx.fillStyle = "#0ea5e9"; 
                 ctx.shadowColor = "#0ea5e9";
                 ctx.shadowBlur = 12;
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Ligne d'orientation (Le nez du robot pointant vers l'avant)
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
-                ctx.lineTo(18, 0); // Ligne droite vers l'avant
+                ctx.lineTo(18, 0); 
                 ctx.strokeStyle = "#ffffff";
                 ctx.lineWidth = 3;
                 ctx.stroke();
@@ -191,7 +237,6 @@
             }
         }
 
-        // Dessiner un terrain vide à l'initialisation de la page
         drawField({robot_x: 0, robot_y: 0, robot_angle: 0, ball_x: 0, ball_y: 0});
     </script>
 </body>
