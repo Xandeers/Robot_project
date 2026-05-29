@@ -11,7 +11,7 @@ from src.camera.Tracker.enemy import EnemyTracker
 from src.terrain.graph import Graph
 
 
-# --- Configuration Réseau ---
+
 ip = ""
 port = 8080
 MaximumPacketSize = 1400
@@ -20,7 +20,6 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
 print("Listening for UDP frames...")
 
-# --- Initialisation des modules ---
 terrain_manager = TerrainIMG(num_zones=2, points_per_zone=8)
 ball_tracker = BallTracker()
 robot_tracker = RobotTracker(robot_id=1)
@@ -72,7 +71,7 @@ if len(terrain_manager.points) == 16:
         print("Erreur calibration initiale : %s" % e)
 
 
-# --- Fenêtre vidéo ---
+
 window_name = "Received Frame"
 cv2.namedWindow(window_name)
 cv2.setMouseCallback(window_name, terrain_manager.mouse_callback)
@@ -104,7 +103,7 @@ while True:
 
                 if frame is not None:
 
-                    # --- 1. Calibration ---
+                    #Calibration ---
                     if len(terrain_manager.points) < 16:
                         cv2.putText(
                             frame,
@@ -134,7 +133,7 @@ while True:
                         except Exception as e:
                             print("Erreur matrice : %s" % e)
 
-                    # --- 2. Tracking vidéo ---
+                    # Tracking vidéo ---
                     ball_info = ball_tracker.get_position(frame)
                     frame = ball_tracker.draw_ball(frame, ball_info)
 
@@ -150,7 +149,7 @@ while True:
                     coord_robot_cm = None
                     coord_enemies_cm = []
 
-                    # --- 3. Conversion robot en cm ---
+                    # Conversion robot en cm ---
                     if robot_info and is_calibrated:
                         pos_robot = robot_info["center"]
 
@@ -168,7 +167,7 @@ while True:
                                 cam_id=2
                             )
 
-                    # --- 4. Conversion ennemis en cm ---
+                    # Conversion ennemis en cm ---
                     if enemies_info and is_calibrated:
                         for enemy in enemies_info:
                             pos_enemy = enemy["center"]

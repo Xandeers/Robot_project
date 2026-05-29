@@ -9,15 +9,12 @@ from camera.terrain import TerrainIMG
 from camera.Tracker.ball import BallTracker
 from src.terrain.graph import Graph, Coordonee 
 
-# =====================================================================
-# 1. CONFIGURATION RÉSEAU ET TERRAIN
-# =====================================================================
-# --- Vidéo (Réception) ---
+
 ip_video = ""  
 port_video = 8080
 MaximumPacketSize = 1400
 
-# --- Robot EV3 (Envoi) ---
+
 IP_ROBOT = "192.168.1.50"  #IP du robot attention 
 PORT_ROBOT = 9999
 sock_robot = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Socket d'envoi UDP
@@ -27,9 +24,6 @@ LARGEUR_TERRAIN = 301.0
 LONGUEUR_TERRAIN = 390.0
 pos_but = Coordonee(LARGEUR_TERRAIN / 2.0, 20.0) 
 
-# =====================================================================
-# 2. INITIALISATION DES OUTILS
-# =====================================================================
 terrain_manager = TerrainIMG(num_zones=2, points_per_zone=8)
 ball_tracker = BallTracker()
 graph = Graph(x_widthCM=LARGEUR_TERRAIN, y_lengthCM=LONGUEUR_TERRAIN)
@@ -45,9 +39,7 @@ window_name = "Cerveau PC - Vision & Contrôle"
 cv2.namedWindow(window_name)
 cv2.setMouseCallback(window_name, terrain_manager.mouse_callback)
 
-# =====================================================================
-# 3. FONCTIONS D'INTELLIGENCE
-# =====================================================================
+
 def trouver_robot_aruco(frame):
     """Trouve le marqueur ArUco et déduit le centre et l'angle du robot"""
     try:
@@ -116,9 +108,7 @@ def envoyer_ordre_ev3(action):
     except:
         pass
 
-# =====================================================================
-# 4. BOUCLE VIDÉO ET CONTRÔLE
-# =====================================================================
+
 data_buffer = {}
 current_frame_id = -1
 messageHeader = 4
@@ -137,25 +127,25 @@ while True:
                 frame = cv2.imdecode(frame_buffer, 1)
                 
                 if frame is not None:
-                    # -- 1. HOMOGRAPHIE --
+                   
                     if len(terrain_manager.points) == 16 and not matrice_calibre:
                         pts_pixels = terrain_manager.points[0:4]
                         pts_cm = [(0, 0), (LARGEUR_TERRAIN, 0), (LARGEUR_TERRAIN, LONGUEUR_TERRAIN), (0, LONGUEUR_TERRAIN)]
                         graph.matriceConfig(pts_pixels, pts_cm, id_cam=1)
                         matrice_calibre = True
-                        print("✅ Calibrage Terrain OK !")
+                        print(" Calibrage Terrain OK !")
 
                     if len(terrain_manager.points) < 16:
                         cv2.putText(frame, f"Calibration: {len(terrain_manager.points)}/16", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                         
-                    # -- 2. TRACKING --
+                    
                     ball_info = ball_tracker.get_position(frame)
                     robot_info = trouver_robot_aruco(frame)
                     
                     frame = ball_tracker.draw_ball(frame, ball_info)
                     frame = terrain_manager.draw_zones(frame)
 
-                    # -- 3. DÉCISION ET TIR RÉSEAU --
+                  
                     if ball_info and robot_info and matrice_calibre:
                         pos_ball_px = ball_info["center"]
                         pos_robot_px = robot_info["center"]

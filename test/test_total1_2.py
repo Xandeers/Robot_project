@@ -11,7 +11,7 @@ from src.terrain.graph import Graph, Coordonee
 
 IP_ROBOT="172.20.10.3"
 
-# --- Configuration Réseau (Réception Vidéo) ---
+#config reseau  
 ip = ""  
 port = 8080
 MaximumPacketSize = 1400
@@ -20,7 +20,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
 print("Listening for UDP frames...")
 
-# --- Initialisation des modules ---
+#init
 terrain_manager = TerrainIMG(num_zones=2, points_per_zone=8)
 ball_tracker = BallTracker()
 robot_tracker = RobotTracker(robot_id=1)
@@ -32,12 +32,12 @@ ia_trajectoire = TrajectoryLogic(ip_robot=IP_ROBOT, port_robot=9999)
 
 is_calibrated = False
 
-# --- Coordonnées physiques (en centimètres) ---
+#  Coordonnées physiques (en centimètres) 
 POINTS_REELS_CM = [
-    # --- ZONE 1 (Flux Caméra 1) ---
+    #  ZONE 1 (Flux Caméra 1) 
     (0, 195), (150.5, 195), (301, 195), (301, 292.5), 
     (301, 390), (150.5, 390), (0, 390), (0, 292.5),
-    # --- ZONE 2 (Flux Caméra 2 - Inversée) ---
+    #  ZONE 2 (Flux Caméra 2 - Inversée) 
     (301, 195), (150.5, 195), (0, 195), (0, 97.5), 
     (0, 0), (150.5, 0), (301, 0), (301, 97.5)
 ]
@@ -60,15 +60,14 @@ current_frame_id = -1
 messageHeader = 4
 headerSize = 8
 
-# --- NOUVEAU : Variables pour le filtre et l'Hystérésis ---
+# var pour le filtre et l'Hystérésis 
 zone_active_robot = 0
 robot_filtre_x = None
 robot_filtre_y = None
 robot_filtre_angle = None
-ALPHA = 1  # Force du lissage (0.25 = très lisse, 0.8 = très réactif)
+ALPHA = 1  # Force du lissage
 
 
-# --- Boucle Principale ---
 while True:
     try:
         packet, addr = sock.recvfrom(MaximumPacketSize)
@@ -83,7 +82,7 @@ while True:
                 frame = cv2.imdecode(frame_buffer, 1)
                 
                 if frame is not None:
-                    # 1. Calibration
+                    # Calibration
                     if len(terrain_manager.points) < 16:
                         cv2.putText(frame, f"Calibration: {len(terrain_manager.points)}/16", 
                                     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
@@ -97,7 +96,7 @@ while True:
                         except Exception as e:
                             print(f"Erreur de matrice : {e}")
 
-                    # 2. Tracking
+                    # Tracking
                     ball_info = ball_tracker.get_position(frame)
                     frame = ball_tracker.draw_ball(frame, ball_info)
 
@@ -109,7 +108,7 @@ while True:
                     coord_cm = None
                     coord_robot_cm = None
 
-                    # --- 3. Calcul Robot (cm) avec Hystérésis et Filtre Alpha ---
+                    #Calcul Robot en cm
                     if robot_info and is_calibrated:
                         pos_robot = robot_info["center"]
                         angle_camera = robot_info["angle"] 
@@ -117,42 +116,42 @@ while True:
                         in_zone_0 = terrain_manager.is_in_zone(pos_robot, 0)
                         in_zone_1 = terrain_manager.is_in_zone(pos_robot, 1)
                         
-                        # A. Hystérésis (Zone Collante)
+                        
                         if in_zone_0 and in_zone_1:
-                            pass # Dans la zone commune : on garde la caméra actuelle !
+                            pass 
                         elif in_zone_0:
                             zone_active_robot = 0
                         elif in_zone_1:
                             zone_active_robot = 1
                             
-                        # B. Conversion Brute
+                        #Conversion 
                         coord_brute = None
                         if zone_active_robot == 0:
                             coord_brute = mon_graph.convertir_pixel_to_graph(pos_robot[0], pos_robot[1], cam_id=1, angle_cam=angle_camera)
                         elif zone_active_robot == 1:
                             coord_brute = mon_graph.convertir_pixel_to_graph(pos_robot[0], pos_robot[1], cam_id=2, angle_cam=angle_camera)
 
-                        # C. Filtre Alpha (Lissage)
+                        # filtr alpha
                         if coord_brute is not None:
                             if robot_filtre_x is None:
-                                # Premier passage : on initialise les valeurs
+                                #initialise les valeurs
                                 robot_filtre_x = coord_brute.x
                                 robot_filtre_y = coord_brute.y
                                 robot_filtre_angle = coord_brute.angle
                             else:
-                                # Lissage des positions X et Y
+                                # lissage pos x et y 
                                 robot_filtre_x = (1 - ALPHA) * robot_filtre_x + ALPHA * coord_brute.x
                                 robot_filtre_y = (1 - ALPHA) * robot_filtre_y + ALPHA * coord_brute.y
                                 
-                                # Lissage intelligent de l'angle (gestion du passage 180 / -180)
+                                # lissage de l'angle
                                 if coord_brute.angle is not None and robot_filtre_angle is not None:
                                     diff_angle = (coord_brute.angle - robot_filtre_angle + 180) % 360 - 180
                                     robot_filtre_angle = robot_filtre_angle + ALPHA * diff_angle
                                     
-                            # On crée la coordonnée finale parfaitement stable !
+                            #calc coordonné final 
                             coord_robot_cm = Coordonee(robot_filtre_x, robot_filtre_y, angle=robot_filtre_angle)
 
-                    # --- Calcul Balle (cm) ---
+                    #  Calcul Balle (cm) 
                     if ball_info and is_calibrated:
                         pos = ball_info["center"]
                         if terrain_manager.is_in_zone(pos, 0):
@@ -166,12 +165,12 @@ while True:
                                 cv2.putText(frame, "!!! BUT !!!", (200, 200), 
                                     cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 5)
 
-                    # --- 4. INTELLIGENCE ARTIFICIELLE & PILOTAGE EV3 ---
+                    # Pilotage 
                     if coord_cm is not None and coord_robot_cm is not None:
                         # Le cerveau calcule la meilleure action
                         ordre, phase, pt_tir = ia_trajectoire.calculer_ordre(coord_robot_cm, coord_cm)
                         
-                        # Le PC envoie directement l'ordre au robot
+                        # pc envoie message
                         nom_ordre = ia_trajectoire.envoyer_ordre(ordre)
                         
                         # Affichage sur l'écran
@@ -180,7 +179,7 @@ while True:
                         cv2.putText(frame, f"Action: {nom_ordre}", (10, 110), 
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
                         
-                    # 5. Affichage Radar & Vidéo
+                    # affichage radar etc.. 
                     carte_radar = mon_graph.afficher_minimap(coord_balle_cm=coord_cm, coord_robot_cm=coord_robot_cm)
                     cv2.imshow("Radar Terrain Physique (cm)", carte_radar)
                     cv2.imshow(window_name, frame)
@@ -197,7 +196,7 @@ while True:
     except socket.error:
         continue
 
-# --- SÉCURITÉ : ARRÊT DU ROBOT À LA FERMETURE ---
+#Securité arret du robot  
 print("Fermeture... Envoi de l'ordre STOP au robot.")
 ia_trajectoire.envoyer_ordre(3)
 

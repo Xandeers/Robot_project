@@ -11,8 +11,8 @@ from src.robot.logic.trajectoire import TrajectoryLogic
 from src.terrain.graph import Graph, Coordonee
 
 
-from src.camera.Tracker.enemy import EnemyTracker  # Ton nouveau tracker d'essaim
-from supervison.server import lancer_dashbord, envoye # L'interface Web
+from src.camera.Tracker.enemy import EnemyTracker 
+from supervison.server import lancer_dashbord, envoye 
 
 IP_ROBOT="172.20.10.3"
 
