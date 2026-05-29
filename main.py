@@ -14,7 +14,7 @@ from src.terrain.graph import Graph, Coordonee
 from src.camera.Tracker.enemy import EnemyTracker 
 from supervison.server import lancer_dashbord, envoye 
 
-IP_ROBOT="172.20.10.3"
+IP_ROBOT="172.20.10.3" ####ATTENTION CHANGEZ 
 
 # --- Lancement du Serveur Web (Dashboard) ---
 print("Démarrage de l'interface de supervision en arrière-plan...")
