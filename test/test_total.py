@@ -13,7 +13,7 @@ from src.terrain.graph import Graph
 
 IP_ROBOT="172.20.10.3"
 
-# --- Configuration Réseau (Réception Vidéo) ---
+#config res
 ip = ""  
 port = 8080
 MaximumPacketSize = 1400
@@ -22,14 +22,14 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
 print("Listening for UDP frames...")
 
-# --- Initialisation des modules ---
+#init
 terrain_manager = TerrainIMG(num_zones=2, points_per_zone=8)
 ball_tracker = BallTracker()
 robot_tracker = RobotTracker(robot_id=1)
 mon_graph = Graph(x_widthCM=301, y_lengthCM=390)
 mon_graph.set_cage(x_min=100, x_max=200, y_min=370, y_max=390)
 
-# Envoi vers EV3 
+# Envoi
 ia_trajectoire = TrajectoryLogic(ip_robot=IP_ROBOT, port_robot=9999) 
 
 is_calibrated = False
@@ -62,7 +62,7 @@ current_frame_id = -1
 messageHeader = 4
 headerSize = 8
 
-# --- Boucle Principale ---
+
 while True:
     try:
         packet, addr = sock.recvfrom(MaximumPacketSize)
@@ -131,22 +131,21 @@ while True:
                                 cv2.putText(frame, "!!! BUT !!!", (200, 200), 
                                     cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 5)
 
-                    # --- 3. INTELLIGENCE ARTIFICIELLE & PILOTAGE EV3 ---
+                    # logiq
                     if coord_cm is not None and coord_robot_cm is not None:
-                        # Le cerveau calcule la meilleure action
-                        # NOUVEAU : L'IA ne prend plus "robot_info", elle est totalement aveugle aux pixels !
+                        
                         ordre, phase, pt_tir = ia_trajectoire.calculer_ordre(coord_robot_cm, coord_cm)
                         
-                        # Le PC envoie directement l'ordre au robot
+                   
                         nom_ordre = ia_trajectoire.envoyer_ordre(ordre)
                         
-                        # Affichage sur l'écran
+                        
                         cv2.putText(frame, f"Phase: {phase}", (10, 80), 
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
                         cv2.putText(frame, f"Action: {nom_ordre}", (10, 110), 
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
                         
-                    # 4. Affichage Radar & Vidéo
+               
                     carte_radar = mon_graph.afficher_minimap(coord_balle_cm=coord_cm, coord_robot_cm=coord_robot_cm)
                     cv2.imshow("Radar Terrain Physique (cm)", carte_radar)
                     cv2.imshow(window_name, frame)
@@ -163,7 +162,7 @@ while True:
     except socket.error:
         continue
 
-# --- SÉCURITÉ : ARRÊT DU ROBOT À LA FERMETURE ---
+
 print("Fermeture... Envoi de l'ordre STOP au robot.")
 ia_trajectoire.envoyer_ordre(3)
 

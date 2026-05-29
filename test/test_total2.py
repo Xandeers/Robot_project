@@ -14,7 +14,7 @@ lancer_dashbord()
 
 IP_ROBOT="172.20.10.11"
 
-# --- Configuration Réseau (Réception Vidéo) ---
+#Configuration Réseau
 ip = ""  
 port = 8080
 MaximumPacketSize = 1400
@@ -35,12 +35,12 @@ ia_trajectoire = TrajectoryLogic(ip_robot=IP_ROBOT, port_robot=9999)
 
 is_calibrated = False
 
-# --- Coordonnées physiques (en centimètres) ---
+# Coordonnées physiques 
 POINTS_REELS_CM = [
-    # --- ZONE 1 (Flux Caméra 1) ---
+    # ZONE 1 
     (0, 195), (150.5, 195), (301, 195), (301, 292.5), 
     (301, 390), (150.5, 390), (0, 390), (0, 292.5),
-    # --- ZONE 2 (Flux Caméra 2 - Inversée) ---
+    # ZONE 2 (Flux Caméra 2 - Inversée)
     (301, 195), (150.5, 195), (0, 195), (0, 97.5), 
     (0, 0), (150.5, 0), (301, 0), (301, 97.5)
 ]
@@ -63,7 +63,7 @@ current_frame_id = -1
 messageHeader = 4
 headerSize = 8
 
-# --- Boucle Principale ---
+#
 while True:
     try:
         packet, addr = sock.recvfrom(MaximumPacketSize)
@@ -173,7 +173,7 @@ while True:
     except socket.error:
         continue
 
-# --- SÉCURITÉ : ARRÊT DU ROBOT À LA FERMETURE ---
+#SÉCURITÉ 
 print("Fermeture... Envoi de l'ordre STOP au robot.")
 ia_trajectoire.envoyer_ordre(3)
 

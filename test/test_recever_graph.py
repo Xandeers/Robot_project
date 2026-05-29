@@ -9,7 +9,7 @@ from src.camera.Tracker.robot import RobotTracker
 
 from src.terrain.graph import Graph 
 
-# --- Configuration Réseau ---
+
 ip = ""  
 port = 8080
 MaximumPacketSize = 1400
@@ -18,7 +18,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((ip, port))
 print("Listening for UDP frames...")
 
-# --- Initialisation des modules ---
+
 terrain_manager = TerrainIMG(num_zones=2, points_per_zone=8)
 ball_tracker = BallTracker()
 robot_tracker = RobotTracker(robot_id=1)
@@ -26,8 +26,7 @@ mon_graph = Graph(x_widthCM=301, y_lengthCM=390)
 mon_graph.set_cage(x_min=100, x_max=200, y_min=370, y_max=390)
 is_calibrated = False
 
-# --- Coordonnées physiques (en centimètres) ---
-# Ton ordre conservé tel que tu l'as défini et vérifié.
+
 POINTS_REELS_CM = [
     # --- ZONE 1 (Flux Caméra 1) ---
     (0, 195),      # 1
@@ -50,8 +49,6 @@ POINTS_REELS_CM = [
     (301, 97.5)    # 16
 ]
 
-# Si le fichier JSON existait, TerrainIMG a déjà chargé les 16 points, 
-# on peut donc calibrer instantanément les DEUX matrices :
 if len(terrain_manager.points) == 16:
     try:
         mon_graph.matriceConfig(terrain_manager.points[0:8], POINTS_REELS_CM[0:8], id_cam=1)
@@ -61,7 +58,7 @@ if len(terrain_manager.points) == 16:
     except Exception as e:
         print(f"Erreur lors de la calibration initiale : {e}")
 
-# --- Configuration de la fenêtre vidéo ---
+
 window_name = "Received Frame"
 cv2.namedWindow(window_name)
 cv2.setMouseCallback(window_name, terrain_manager.mouse_callback)
@@ -71,7 +68,7 @@ current_frame_id = -1
 messageHeader = 4
 headerSize = 8
 
-# --- Boucle Principale ---
+
 while True:
     try:
         packet, addr = sock.recvfrom(MaximumPacketSize)
@@ -105,7 +102,7 @@ while True:
                         except Exception as e:
                             print(f"Erreur de matrice : {e}")
 
-                    # 2. Tracking et Dessin Vidéo
+                    # Tracking et Dessin Vidéo
                     ball_info = ball_tracker.get_position(frame)
                     frame = ball_tracker.draw_ball(frame, ball_info)
 
@@ -124,11 +121,11 @@ while True:
                             if terrain_manager.is_in_zone(pos_robot, 0):
                                 coord_robot_cm = mon_graph.convertir_pixel_to_graph(pos_robot[0], pos_robot[1], cam_id=1)
                             
-                            # Test Zone 2 pour le robot
+                           
                             elif terrain_manager.is_in_zone(pos_robot, 1):
                                 coord_robot_cm = mon_graph.convertir_pixel_to_graph(pos_robot[0], pos_robot[1], cam_id=2)
 
-                    # 3. Logique Balle (Centimètres & Zones séparées)
+                    
                     if ball_info:
                         pos = ball_info["center"]
                         
@@ -164,11 +161,11 @@ while True:
                                         cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 5)
                                     print(" La balle est dans la cage !")
                         
-                    # 4. Affichage de la Minimap Radar
+               
                     carte_radar = mon_graph.afficher_minimap(coord_balle_cm=coord_cm, coord_robot_cm=coord_robot_cm)
                     cv2.imshow("Radar Terrain Physique (cm)", carte_radar)
                         
-                    # 5. Affichage Vidéo Originale
+                    
                     cv2.imshow(window_name, frame)
                     
                     ch = chr(cv2.waitKey(1) & 0xFF)
