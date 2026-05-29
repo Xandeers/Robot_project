@@ -54,8 +54,9 @@ Les librairies suivantes sont nécessaires pour lancer le traitement d'image et 
 ```bash
 pip install -r required.txt
 ```
-
 ## Structure
+
+```text
 Robot_project/
 │
 ├── main.py                     # Boucle principale (Vision + Serveur)
@@ -75,9 +76,9 @@ Robot_project/
 │   │   └── trajectoire.py      # IA, choix de la phase de jeu et envoi UDP
 │   │
 │   └── audio/                  # Fichiers .wav convertis pour l'EV3
-
-le repertoire simulateur etait le prototype de l'utilisation d'un reseau neurone une ia pou rpiloter l'ia 
-
+│
+└── simulateur/                 # Prototype d'utilisation d'un réseau de neurones pour piloter l'IA
+```
 
 ## Guide d'Utilisation
 
