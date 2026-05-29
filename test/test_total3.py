@@ -83,9 +83,7 @@ robot_filtre_angle = None
 ALPHA = 0.98  # Force du lissage
 
 
-# ==========================================
-# BOUCLE PRINCIPALE DE JEU
-# ==========================================
+
 while True:
     try:
         packet, addr = sock.recvfrom(MaximumPacketSize)
@@ -114,16 +112,14 @@ while True:
                         except Exception as e:
                             print(f"Erreur de matrice : {e}")
 
-                    # ==========================================
-                    # 2. TRACKING VISUEL (Pixels)
-                    # ==========================================
+                    # tracking visuel pix
                     ball_info = ball_tracker.get_position(frame)
                     frame = ball_tracker.draw_ball(frame, ball_info)
 
                     robot_info = robot_tracker.getposition(frame)
                     frame = robot_tracker.drawRobot(frame, robot_info)
                     
-                    # NOUVEAU : Tracking des Ennemis & Alliés
+                    #Tracking des Ennemis & Alliés
                     allies_info, enemies_info = enemy_tracker.get_positions(frame)
                     frame = enemy_tracker.draw_entities(frame, allies_info, enemies_info)
 
@@ -135,11 +131,9 @@ while True:
                     coord_enemies_cm = []    # Ennemis
                     coord_allies_cm = []     # Alliés
 
-                    # ==========================================
-                    # 3. CONVERSION MATRICIELLE (Pixels -> Centimètres)
-                    # ==========================================
+                    #conv matriciel
                     if is_calibrated:
-                        # --- IDEFIX (Hystérésis & Filtre) ---
+                    
                         if robot_info:
                             pos_robot = robot_info["center"]
                             angle_camera = robot_info["angle"] 
@@ -174,7 +168,7 @@ while True:
                                         
                                 coord_robot_cm = Coordonee(robot_filtre_x, robot_filtre_y, angle=robot_filtre_angle)
 
-                        # --- BALLE ---
+                        #BALLE 
                         if ball_info:
                             pos = ball_info["center"]
                             if terrain_manager.is_in_zone(pos, 0):
@@ -182,7 +176,7 @@ while True:
                             elif terrain_manager.is_in_zone(pos, 1):
                                 coord_cm = mon_graph.convertir_pixel_to_graph(pos[0], pos[1], cam_id=2)
 
-                        # --- NOUVEAU : ENNEMIS ET ALLIÉS ---
+                        # ENNEMIS ET ALLIÉS ---
                         for en in enemies_info:
                             pos = en["center"]
                             if terrain_manager.is_in_zone(pos, 0):
@@ -202,9 +196,7 @@ while True:
                                 if c: coord_allies_cm.append({"id": al["id"], "coord": c})
 
 
-                    # ==========================================
-                    # 4. ÉTATS DU MATCH ET INTELLIGENCE ARTIFICIELLE
-                    # ==========================================
+                    
                     balle_en_jeu = False
                     balle_au_but = False
                     
@@ -239,9 +231,7 @@ while True:
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
 
 
-                    # ==========================================
-                    # 5. SYNCHRONISATION DASHBOARD WEB (SocketIO)
-                    # ==========================================
+                    # websocket et web
                     # Extraction sécurisée des données pour le web
                     web_rx = coord_robot_cm.x if coord_robot_cm else 0
                     web_ry = coord_robot_cm.y if coord_robot_cm else 0
@@ -264,9 +254,9 @@ while True:
                     )
 
 
-                    # ==========================================
-                    # 6. AFFICHAGES OPENCV LOCAUX
-                    # ==========================================
+           
+                    # AFFICHAGES  LOCAUX
+                    
                     carte_radar = mon_graph.afficher_minimap(
                         coord_balle_cm=coord_cm, 
                         coord_robot_cm=coord_robot_cm,
@@ -289,7 +279,7 @@ while True:
     except socket.error:
         continue
 
-# --- SÉCURITÉ : ARRÊT DU ROBOT À LA FERMETURE ---
+#SÉCURITÉ ARRÊT DU ROBOT À LA FERMETURE
 print("Fermeture... Envoi de l'ordre STOP au robot.")
 ia_trajectoire.envoyer_ordre(3)
 
